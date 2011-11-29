@@ -30,4 +30,9 @@ public class Server extends Network {
 		
 		connect();
 	}
+	
+	public void close() throws IOException {
+		super.close();
+		serverSocket.close();
+	}
 }

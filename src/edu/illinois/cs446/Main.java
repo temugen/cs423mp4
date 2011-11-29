@@ -38,6 +38,8 @@ public class Main {
 
 		while(!done) {
 			String line = network.read();
+			if(line == null)
+				continue;
 			System.out.println(line);
 			
 			if(line.equals("vector")) {
