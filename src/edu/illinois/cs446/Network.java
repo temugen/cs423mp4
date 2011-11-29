@@ -10,21 +10,29 @@ public class Network {
 	protected PrintWriter out;
 	protected BufferedReader in;
 	protected Socket remoteSocket;
+	protected boolean connected;
 	
 	protected void connect() throws IOException {
+		connected = true;
 		out = new PrintWriter(remoteSocket.getOutputStream(), true);
 		in = new BufferedReader(new InputStreamReader(remoteSocket.getInputStream()));
 	}
 	
-	public String read() throws IOException {
-		return in.readLine();
+	public String read() {
+		try {
+			return in.readLine();
+		} catch(IOException e) {
+			connected = false;
+			return null;
+		}
 	}
 	
-	public void write(String line) throws IOException {
+	public void write(String line) {
 		out.println(line);
 	}
 	
 	public void close() throws IOException {
+		connected = false;
 		in.close();
 		out.close();
 		remoteSocket.close();
