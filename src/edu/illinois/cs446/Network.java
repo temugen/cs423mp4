@@ -18,13 +18,8 @@ public class Network {
 		in = new BufferedReader(new InputStreamReader(remoteSocket.getInputStream()));
 	}
 	
-	public String read() {
-		try {
-			return in.readLine();
-		} catch(IOException e) {
-			connected = false;
-			return null;
-		}
+	public String read() throws IOException {
+		return in.readLine();
 	}
 	
 	public void write(String line) {

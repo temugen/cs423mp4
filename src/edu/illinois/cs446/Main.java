@@ -14,6 +14,7 @@ public class Main {
 	public static void main(String[] args) throws IOException {
 		int matrix[][] = null;
 		int vector[] = null;
+		boolean done = false;
 	
 		Network network;
 		if(args.length > 1) {
@@ -30,9 +31,11 @@ public class Main {
 			for(Integer num : initial_vector) {
 				network.write(num.toString());
 			}
+			
+			done = true;
 		}
 
-		while(network.connected) {
+		while(!done) {
 			String line = network.read();
 			if(line == null)
 				continue;
@@ -44,10 +47,7 @@ public class Main {
 				for(int i = 0; i < count; i++) {
 					vector[i] = new Integer(network.read());
 				}
-				network.write("close");
-			}
-			else if(line.equals("close")) {
-				network.close();
+				done = true;
 			}
 		}
 		
