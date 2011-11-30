@@ -24,6 +24,7 @@ public class Matrix {
 			}
 		}
 		matrix = firstHalf;
+		rows = rows / 2;
 		return new Matrix(secondHalf);
 	}
 	
@@ -41,6 +42,7 @@ public class Matrix {
 			}
 		}
 		matrix = firstHalf;
+		columns = columns / 2;
 		return new Matrix(secondHalf);
 	}
 }
