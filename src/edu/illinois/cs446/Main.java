@@ -4,8 +4,8 @@ import java.io.IOException;
 
 public class Main {
 	
-	private static int initial_matrix1[][] = {{3, 1}, {5, 9}, {5, 2}};
-	private static int initial_matrix2[][] = {{2, 7}, {4, 6}, {9, 8}, {1, 7}, {2, 2}, {0, 4}};
+	private static int initial_matrix1[][] = {{3, 1},{5, 9}, {5, 2}};
+	private static int initial_matrix2[][] = {{2, 7, 8, 5, 2, 4, 5, 9, 0, 1}, {4, 6, 3, 8, 3, 5, 9, 1, 3, 2}};
 	private static Network network;
 	
 	private static void sendMatrix(Matrix matrix, String id) {
