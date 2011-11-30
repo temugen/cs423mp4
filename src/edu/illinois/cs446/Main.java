@@ -76,7 +76,7 @@ public class Main {
 			if(line.equals("matrix1")) {
 				matrix1 = readMatrix();
 			}
-			else if(line.equals("matrix")) {
+			else if(line.equals("matrix2")) {
 				matrix2 = readMatrix();
 				done = true;
 			}
