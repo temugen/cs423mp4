@@ -5,11 +5,12 @@ import java.nio.IntBuffer;
 import java.util.Map;
 
 
-public class Main {
+public class Adaptor {
 	private static Network network;
 	private static final JobQueue jobs = new JobQueue(1000);
 	private static final ResultMap result = new ResultMap();
 	private static TransferManager transferManager;
+	private static final HardwareMonitor hardwareMonitor = new HardwareMonitor();
 	
 	private static void initClient(String host, int port) throws IOException {
 		//Split pixels in half
