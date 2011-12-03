@@ -22,9 +22,8 @@ public class Main {
 		network.write("pixels");
 		network.write(new Integer(split[1].capacity()).toString());
 		split[1].position(0);
-		for(int i = 0; i < split[1].capacity(); i++) {
-			network.write(Integer.toString(split[1].get(), 36));
-		}
+		for(int i = 0; i < split[1].capacity(); i++)
+			network.write(Integer.toString(split[1].get(), Character.MAX_RADIX));
 		
 		done = true;
 	}
@@ -51,10 +50,8 @@ public class Main {
 			if(line.equals("pixels")) {
 				int count = new Integer(network.read());
 				IntBuffer buffer = IntBuffer.allocate(count);
-				for(int i = 0; i < count; i++) {
-					String base36 = network.read();
-					buffer.put(Integer.parseInt(base36, 36));
-				}
+				for(int i = 0; i < count; i++)
+					buffer.put(Integer.parseInt(network.read(), Character.MAX_RADIX));
 				jobs.add(buffer);
 				
 				done = true;
