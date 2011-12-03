@@ -62,19 +62,27 @@ public class TransferManager extends Thread {
 			if(line.equals("bootstrapped_syn")) {
 				readPixels();
 				network.write("bootstrapped_ack");
-				notifyAll();
+				synchronized (this) {
+					notifyAll();
+				}
 			}
 			else if(line.equals("bootstrapped_ack")) {
-				notifyAll();
+				synchronized (this) {
+					notifyAll();
+				}
 			}
 			else if(line.equals("finished_syn")) {
 				network.write("finished_ack");
 				writeResult();
-				notifyAll();
+				synchronized (this) {
+					notifyAll();
+				}
 			}
 			else if(line.equals("finished_ack")) {
 				readResult();
-				notifyAll();
+				synchronized (this) {
+					notifyAll();
+				}
 			}
 		}
 	}
