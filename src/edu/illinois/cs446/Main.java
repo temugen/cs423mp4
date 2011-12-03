@@ -52,8 +52,8 @@ public class Main {
 				int count = new Integer(network.read());
 				IntBuffer buffer = IntBuffer.allocate(count);
 				for(int i = 0; i < count; i++) {
-					String newline = network.read();
-					buffer.put(Integer.decode(network.read()));
+					String hex = "0x" + network.read();
+					buffer.put(Integer.decode(hex));
 				}
 				jobs.add(buffer);
 				
