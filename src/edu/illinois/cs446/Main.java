@@ -42,17 +42,21 @@ public class Main {
 			initClient(args[0], new Integer(args[1]));
 		else
 			initServer(new Integer(args[0]));
+
+		TransferManager transferManager = new TransferManager(network, jobs);
+		transferManager.start();
+		
+		//Wait for received jobs
+		while(jobs.isEmpty())
+			Thread.sleep(100);
 		
 		//Start worker threads
 		Worker worker = new Worker(jobs, result, 0.7f);
 		worker.start();
 		
-		TransferManager transferManager = new TransferManager(network, jobs);
-		transferManager.start();
-		
 		//Wait for jobs to complete
 		while(!jobs.isEmpty())
-			Thread.sleep(1000);
+			Thread.sleep(100);
 
 		//Print results
 		for(Map.Entry<Integer, Integer> pair : result.entrySet()) {
