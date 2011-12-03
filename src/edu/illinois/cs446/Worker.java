@@ -42,7 +42,7 @@ public class Worker extends Thread {
 			do {
 				count = result.get(pixel);
 				updated = (count == null) ? 1 : (count + 1);
-			} while(result.replace(pixel, count, updated));
+			} while(!result.replace(pixel, count, updated));
 		}
 		end = System.currentTimeMillis();
 		
