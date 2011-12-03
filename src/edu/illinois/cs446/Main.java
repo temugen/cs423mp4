@@ -51,8 +51,10 @@ public class Main {
 			if(line.equals("pixels")) {
 				int count = new Integer(network.read());
 				IntBuffer buffer = IntBuffer.allocate(count);
-				for(int i = 0; i < count; i++)
+				for(int i = 0; i < count; i++) {
+					String newline = network.read();
 					buffer.put(Integer.decode(network.read()));
+				}
 				jobs.add(buffer);
 				
 				done = true;
