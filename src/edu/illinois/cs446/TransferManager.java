@@ -18,8 +18,6 @@ public class TransferManager extends Thread {
 		this.result = result;
 		this.bootstrapped = bootstrapped;
 		this.finished = finished;
-		bootstrapped.lock();
-		finished.lock();
 	}
 	
 	private String getMessage() {
@@ -64,19 +62,19 @@ public class TransferManager extends Thread {
 			if(line.equals("bootstrapped_syn")) {
 				readPixels();
 				network.write("bootstrapped_ack");
-				bootstrapped.unlock();
+				bootstrapped.notifyAll();
 			}
 			else if(line.equals("bootstrapped_ack")) {
-				bootstrapped.unlock();
+				bootstrapped.notifyAll();
 			}
 			else if(line.equals("finished_syn")) {
 				network.write("finished_ack");
 				writeResult();
-				finished.unlock();
+				finished.notifyAll();
 			}
 			else if(line.equals("finished_ack")) {
 				readResult();
-				finished.unlock();
+				finished.notifyAll();
 			}
 		}
 	}
