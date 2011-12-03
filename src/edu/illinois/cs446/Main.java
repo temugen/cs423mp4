@@ -21,10 +21,9 @@ public class Main {
 		network = new Client(host, port);
 		network.write("pixels");
 		network.write(new Integer(split[1].capacity()).toString());
-		System.out.println(new Integer(split[1].capacity()).toString());
 		split[1].position(0);
 		for(int i = 0; i < split[1].capacity(); i++) {
-			network.write(Integer.toString(split[1].get(), 64));
+			network.write(Integer.toString(split[1].get(), 36));
 		}
 		
 		done = true;
@@ -52,10 +51,9 @@ public class Main {
 			if(line.equals("pixels")) {
 				int count = new Integer(network.read());
 				IntBuffer buffer = IntBuffer.allocate(count);
-				System.out.println(count + " pixels");
 				for(int i = 0; i < count; i++) {
-					String base64 = network.read();
-					buffer.put(Integer.parseInt(base64, 64));
+					String base36 = network.read();
+					buffer.put(Integer.parseInt(base36, 36));
 				}
 				jobs.add(buffer);
 				
