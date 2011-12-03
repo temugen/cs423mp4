@@ -2,17 +2,18 @@ package edu.illinois.cs446;
 
 import java.io.IOException;
 import java.nio.IntBuffer;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 public class Main {
-	
 	private static Network network;
-	private static ImageManager images = new ImageManager();
 	private static JobQueue jobs = new JobQueue(1000);
-	private static boolean done = false;
+	private static ConcurrentHashMap<Integer, Integer> result = new ConcurrentHashMap<Integer, Integer>();
 	
 	private static void initClient(String host, int port) throws IOException {
-		//Split out pixels in half
+		//Split pixels in half
+		ImageManager images = new ImageManager();
 		images.load("/Users/temugen/Desktop/images");
 		IntBuffer split[] = ImageManager.splitPixels(images.getPixels());
 		jobs.add(split[0]);
@@ -22,10 +23,8 @@ public class Main {
 		network.write("pixels");
 		network.write(new Integer(split[1].capacity()).toString());
 		split[1].rewind();
-		for(int i = 0; i < split[1].capacity(); i++)
+		while(split[1].hasRemaining())
 			network.write(Integer.toString(split[1].get(), Character.MAX_RADIX));
-		
-		done = true;
 	}
 	
 	private static void initServer(int port) throws IOException {
@@ -35,29 +34,29 @@ public class Main {
 	/**
 	 * @param args
 	 * @throws IOException 
+	 * @throws InterruptedException 
 	 */
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args) throws IOException, InterruptedException {
+		//Bootstrap
 		if(args.length > 1)
 			initClient(args[0], new Integer(args[1]));
 		else
 			initServer(new Integer(args[0]));
-
-		while(!done) {
-			String line = network.read();
-			if(line == null)
-				continue;
-			
-			if(line.equals("pixels")) {
-				int count = new Integer(network.read());
-				IntBuffer buffer = IntBuffer.allocate(count);
-				for(int i = 0; i < count; i++)
-					buffer.put(Integer.parseInt(network.read(), Character.MAX_RADIX));
-				jobs.add(buffer);
-				
-				done = true;
-			}
-		}
 		
-		System.out.println("done!");
+		//Start worker threads
+		Worker worker = new Worker(jobs, result, 0.7f);
+		worker.start();
+		
+		TransferManager transferManager = new TransferManager(network, jobs);
+		transferManager.start();
+		
+		//Wait for jobs to complete
+		while(!jobs.isEmpty())
+			Thread.sleep(1000);
+
+		//Print results
+		for(Map.Entry<Integer, Integer> pair : result.entrySet()) {
+			System.out.println("<" + Integer.toHexString(pair.getKey()) + "," + pair.getValue() + ">");
+		}
 	}
 }

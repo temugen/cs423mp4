@@ -8,13 +8,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.awt.image.BufferedImage;
 
+
 public class ImageManager {
-	private String directory;
 	private List<BufferedImage> images = new ArrayList<BufferedImage>();
 	
 	public void load(String directory) {
-		this.directory = directory;
-		
 		File dir = new File(directory);
 		File[] files = dir.listFiles();
 		for(File file : files) {
