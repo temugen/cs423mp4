@@ -39,10 +39,6 @@ public class Main {
 	 * @throws InterruptedException 
 	 */
 	public static void main(String[] args) throws IOException, InterruptedException {
-		//Start transfer manager
-		TransferManager transferManager = new TransferManager(network, jobs, result, bootstrapped, finished);
-		transferManager.start();
-		
 		//Start worker threads
 		Worker worker = new Worker(jobs, result, 0.7f);
 		worker.start();
@@ -52,6 +48,11 @@ public class Main {
 			initClient(args[0], new Integer(args[1]));
 		else
 			initServer(new Integer(args[0]));
+		
+		//Start transfer manager
+		TransferManager transferManager = new TransferManager(network, jobs, result, bootstrapped, finished);
+		transferManager.start();
+		
 		//Wait for bootstrap process to finish
 		bootstrapped.lock();
 		
