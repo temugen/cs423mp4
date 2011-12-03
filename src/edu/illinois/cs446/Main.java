@@ -8,7 +8,7 @@ public class Main {
 	
 	private static Network network;
 	private static ImageManager images = new ImageManager();
-	private static JobQueue jobs = new JobQueue();
+	private static JobQueue jobs = new JobQueue(1000);
 	private static boolean done = false;
 	
 	private static void initClient(String host, int port) throws IOException {
@@ -21,7 +21,7 @@ public class Main {
 		network = new Client(host, port);
 		network.write("pixels");
 		network.write(new Integer(split[1].capacity()).toString());
-		split[1].position(0);
+		split[1].rewind();
 		for(int i = 0; i < split[1].capacity(); i++)
 			network.write(Integer.toString(split[1].get(), Character.MAX_RADIX));
 		

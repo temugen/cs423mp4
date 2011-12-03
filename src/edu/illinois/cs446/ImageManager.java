@@ -39,9 +39,9 @@ public class ImageManager {
 		split[0] = IntBuffer.allocate(halfCapacity);
 		split[1] = IntBuffer.allocate(pixels.capacity() - halfCapacity);
 		
-		pixels.position(0);
-		for(int i = 0; i < pixels.capacity(); i++) {
-			if(i < halfCapacity)
+		pixels.rewind();
+		while(pixels.hasRemaining()) {
+			if(split[0].hasRemaining())
 				split[0].put(pixels.get());
 			else
 				split[1].put(pixels.get());
