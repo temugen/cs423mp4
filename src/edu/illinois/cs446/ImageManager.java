@@ -1,12 +1,12 @@
 package edu.illinois.cs446;
 
 import javax.imageio.ImageIO;
+import java.nio.IntBuffer;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.awt.image.BufferedImage;
-
 
 public class ImageManager {
 	private String directory;
@@ -33,13 +33,14 @@ public class ImageManager {
 		}
 	}
 	
-	public ImageManager split() {
-		ImageManager man = new ImageManager();
-		int totalSize = getSize();
-		int currentSize = 0;
-		while(currentSize < totalSize / 2)
-			man.add(images.remove(images.size() - 1));
-		return man;
+	public IntBuffer getPixels() {
+		int size = getSize();
+		IntBuffer buff = IntBuffer.allocate(size);
+		for(BufferedImage image : images) {
+			int w = image.getWidth(), h = image.getHeight();
+			buff.put(image.getRGB(0, 0, w, h, null, 0, w));
+		}
+		return buff;
 	}
 	
 	private int getSize() {
