@@ -8,8 +8,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class Main {
 	private static Network network;
-	private static JobQueue jobs = new JobQueue(1000);
-	private static ConcurrentHashMap<Integer, Integer> result = new ConcurrentHashMap<Integer, Integer>();
+	private static final JobQueue jobs = new JobQueue(1000);
+	private static final ConcurrentHashMap<Integer, Integer> result = new ConcurrentHashMap<Integer, Integer>();
 	
 	private static void initClient(String host, int port) throws IOException {
 		//Split pixels in half
