@@ -43,6 +43,8 @@ public class Main {
 		Worker worker = new Worker(jobs, result, 0.7f);
 		worker.start();
 		
+		System.out.println("Started worker threads...");
+		
 		//Bootstrap
 		if(args.length > 1)
 			initClient(args[0], new Integer(args[1]));
@@ -55,6 +57,8 @@ public class Main {
 		
 		//Wait for bootstrap process to finish
 		bootstrapped.lock();
+		
+		System.out.println("Bootstrapped...");
 		
 		//Commander loop
 		if(network instanceof Client) {
@@ -72,6 +76,8 @@ public class Main {
 		else {
 			finished.lock();
 		}
+		
+		System.out.println("Finished...");
 		
 		//Kill all threads
 		System.exit(0);
