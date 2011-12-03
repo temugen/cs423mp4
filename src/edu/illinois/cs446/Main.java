@@ -10,36 +10,19 @@ public class Main {
 	private static ImageManager images = new ImageManager();
 	private static JobQueue jobs = new JobQueue();
 	
-	private static IntBuffer splitPixels(IntBuffer pixels) {
-		int halfCapacity = pixels.capacity() / 2;
-		IntBuffer split1 = IntBuffer.allocate(halfCapacity);
-		IntBuffer split2 = IntBuffer.allocate(pixels.capacity() - halfCapacity);
-		
-		pixels.position(0);
-		for(int i = 0; i < pixels.capacity(); i++) {
-			if(i < halfCapacity)
-				split1.put(pixels.get());
-			else
-				split2.put(pixels.get());
-		}
-		pixels = split1;
-		return split2;
-	}
-	
 	private static void initClient(String host, int port) throws IOException {
 		//Split out pixels in half
 		images.load("/Users/temugen/Desktop/images");
-		IntBuffer pixels = images.getPixels();
-		IntBuffer remote = splitPixels(pixels);
-		jobs.add(pixels);
+		IntBuffer split[] = ImageManager.splitPixels(images.getPixels());
+		jobs.add(split[0]);
 		
 		//Send half of the data to the server
 		network = new Client(host, port);
 		network.write("pixels");
-		network.write(new Integer(remote.capacity()).toString());
-		remote.position(0);
-		for(int i = 0; i < remote.capacity(); i++) {
-			network.write(Integer.toHexString(remote.get()));
+		network.write(new Integer(split[1].capacity()).toString());
+		split[1].position(0);
+		for(int i = 0; i < split[1].capacity(); i++) {
+			network.write(Integer.toHexString(split[1].get()));
 		}
 	}
 	
