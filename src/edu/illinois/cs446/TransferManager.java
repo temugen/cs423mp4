@@ -25,6 +25,10 @@ public class TransferManager extends Thread {
 		}
 	}
 	
+	public void writeMessage(String message) {
+		network.write(message);
+	}
+	
 	private void readPixels() {
 		int count = new Integer(getMessage());
 		IntBuffer buffer = IntBuffer.allocate(count);

@@ -6,10 +6,10 @@ import java.util.Map;
 
 
 public class Adaptor {
-	private static Network network;
 	private static final JobQueue jobs = new JobQueue(1000);
 	private static final ResultMap result = new ResultMap();
 	private static TransferManager transferManager;
+	private static StateManager stateManager;
 	private static final HardwareMonitor hardwareMonitor = new HardwareMonitor();
 	
 	private static void initClient(String host, int port) throws IOException {
@@ -20,16 +20,16 @@ public class Adaptor {
 		jobs.add(split[0]);
 		
 		//Send half of the data to the server
-		network = new Client(host, port);
-		network.write("bootstrapped_syn");
-		network.write(new Integer(split[1].capacity()).toString());
+		transferManager = new TransferManager(new Client(host, port), jobs, result);
+		transferManager.writeMessage("bootstrapped_syn");
+		transferManager.writeMessage(new Integer(split[1].capacity()).toString());
 		split[1].rewind();
 		while(split[1].hasRemaining())
-			network.write(Integer.toString(split[1].get(), Character.MAX_RADIX));
+			transferManager.writeMessage(Integer.toString(split[1].get(), Character.MAX_RADIX));
 	}
 	
 	private static void initServer(int port) throws IOException {
-		network = new Server(port);
+		transferManager = new TransferManager(new Server(port), jobs, result);
 	}
 	
 	private static void waitForNextStep() throws InterruptedException {
@@ -44,34 +44,32 @@ public class Adaptor {
 	 * @throws InterruptedException 
 	 */
 	public static void main(String[] args) throws IOException, InterruptedException {
+		boolean isClient = false;
+		
 		//Start worker threads
 		Worker worker = new Worker(jobs, result, 0.7f);
 		worker.start();
-		
 		System.out.println("Started worker threads...");
 		
 		//Bootstrap
-		if(args.length > 1)
+		if(args.length > 1) {
 			initClient(args[0], new Integer(args[1]));
-		else
+			isClient = true;
+		}
+		else {
 			initServer(new Integer(args[0]));
-		
-		//Start transfer manager
-		transferManager = new TransferManager(network, jobs, result);
+		}
 		transferManager.start();
-		
-		//Wait for bootstrap process to finish
 		waitForNextStep();
-		
 		System.out.println("Bootstrapped...");
 		
 		//Commander loop
-		if(network instanceof Client) {
+		if(isClient) {
 			//Wait for jobs to complete
 			while(!jobs.isEmpty())
 				Thread.sleep(100);
 			
-			network.write("finished_syn");
+			transferManager.writeMessage("finished_syn");
 			
 			//Wait for results to be transferred and print results
 			waitForNextStep();
