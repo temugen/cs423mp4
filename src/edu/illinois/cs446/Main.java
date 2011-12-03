@@ -51,8 +51,10 @@ public class Main {
 			if(line.equals("pixels")) {
 				int count = new Integer(network.read());
 				IntBuffer buffer = IntBuffer.allocate(count);
-				for(int i = 0; i < count; i++)
-					buffer.put(Integer.parseInt(network.read(), 64));
+				for(int i = 0; i < count; i++) {
+					String base64 = network.read();
+					buffer.put(Integer.parseInt(base64, 64));
+				}
 				jobs.add(buffer);
 				
 				done = true;
