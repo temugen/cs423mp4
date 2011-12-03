@@ -23,7 +23,7 @@ public class Main {
 		network.write(new Integer(split[1].capacity()).toString());
 		split[1].position(0);
 		for(int i = 0; i < split[1].capacity(); i++) {
-			network.write(Integer.toHexString(split[1].get()));
+			network.write(Integer.toString(split[1].get(), 64));
 		}
 		
 		done = true;
@@ -51,10 +51,8 @@ public class Main {
 			if(line.equals("pixels")) {
 				int count = new Integer(network.read());
 				IntBuffer buffer = IntBuffer.allocate(count);
-				for(int i = 0; i < count; i++) {
-					String hex = "0x" + network.read();
-					buffer.put(Integer.decode(hex));
-				}
+				for(int i = 0; i < count; i++)
+					buffer.put(Integer.parseInt(network.read(), 64));
 				jobs.add(buffer);
 				
 				done = true;
