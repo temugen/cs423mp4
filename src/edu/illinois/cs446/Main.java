@@ -9,6 +9,7 @@ public class Main {
 	private static Network network;
 	private static ImageManager images = new ImageManager();
 	private static JobQueue jobs = new JobQueue();
+	private static boolean done = false;
 	
 	private static void initClient(String host, int port) throws IOException {
 		//Split out pixels in half
@@ -24,6 +25,8 @@ public class Main {
 		for(int i = 0; i < split[1].capacity(); i++) {
 			network.write(Integer.toHexString(split[1].get()));
 		}
+		
+		done = true;
 	}
 	
 	private static void initServer(int port) throws IOException {
@@ -35,8 +38,6 @@ public class Main {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
-		boolean done = false;
-	
 		if(args.length > 1)
 			initClient(args[0], new Integer(args[1]));
 		else
@@ -53,7 +54,11 @@ public class Main {
 				for(int i = 0; i < count; i++)
 					buffer.put(Integer.decode(network.read()));
 				jobs.add(buffer);
+				
+				done = true;
 			}
 		}
+		
+		System.out.println("done!");
 	}
 }
