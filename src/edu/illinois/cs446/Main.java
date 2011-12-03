@@ -9,11 +9,11 @@ public class Main {
 	
 	private static void initClient(String host, int port) throws IOException {
 		network = new Client(host, port);
+		imageLoader = new ImageLoader("/home/temugen/Desktop/images");
 	}
 	
 	private static void initServer(int port) throws IOException {
 		network = new Server(port);
-		imageLoader = new ImageLoader("/home/temugen/Desktop/images");
 	}
 
 	/**
