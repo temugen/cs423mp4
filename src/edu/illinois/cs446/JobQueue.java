@@ -18,7 +18,7 @@ public class JobQueue extends LinkedBlockingQueue<int[]> {
 		while(buffer.hasRemaining()) {
 			int[] newJob = new int[Math.min(jobSize, buffer.remaining())];
 			buffer.get(newJob);
-			this.add(newJob);
+			add(newJob);
 		}
 	}
 }

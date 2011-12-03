@@ -1,14 +1,12 @@
 package edu.illinois.cs446;
 
-import java.util.concurrent.ConcurrentHashMap;
-
 
 public class Worker extends Thread {
 	private JobQueue jobs;
-	private ConcurrentHashMap<Integer, Integer> result;
+	private ResultMap result;
 	private float throttle = 1.0f;
 	
-	public Worker(JobQueue jobs, ConcurrentHashMap<Integer, Integer> result, float throttle) {
+	public Worker(JobQueue jobs, ResultMap result, float throttle) {
 		this.jobs = jobs;
 		this.result = result;
 		this.throttle = throttle;
@@ -37,16 +35,8 @@ public class Worker extends Thread {
 		}
 		
 		long start = System.currentTimeMillis(), end;
-		for(Integer pixel : pixels) {
-			if (result.putIfAbsent(pixel, 1) == null) {
-		        break;
-		    }
-			
-			Integer count;
-			do {
-				count = result.get(pixel);
-			} while(!result.replace(pixel, count, count + 1));
-		}
+		for(Integer pixel : pixels)
+			result.increment(pixel, 1);
 		end = System.currentTimeMillis();
 		
 		return (end - start);
