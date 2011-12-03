@@ -5,11 +5,12 @@ import java.io.IOException;
 public class Main {
 	
 	private static Network network;
-	private static ImageLoader imageLoader;
+	private static ImageManager images = new ImageManager();
 	
 	private static void initClient(String host, int port) throws IOException {
+		images.load("/Users/temugen/Desktop/images");
+		ImageManager remote = images.split();
 		network = new Client(host, port);
-		imageLoader = new ImageLoader("/home/temugen/Desktop/images");
 	}
 	
 	private static void initServer(int port) throws IOException {
