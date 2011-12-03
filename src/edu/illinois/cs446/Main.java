@@ -56,7 +56,7 @@ public class Main {
 		transferManager.start();
 		
 		//Wait for bootstrap process to finish
-		bootstrapped.wait();
+		transferManager.wait();
 		
 		System.out.println("Bootstrapped...");
 		
@@ -69,12 +69,12 @@ public class Main {
 			network.write("finished_syn");
 			
 			//Wait for results to be transferred and print results
-			finished.wait();
+			transferManager.wait();
 			for(Map.Entry<Integer, Integer> pair : result.entrySet())
 				System.out.println("<" + Integer.toHexString(pair.getKey()) + "," + pair.getValue() + ">");
 		}
 		else {
-			finished.wait();
+			transferManager.wait();
 		}
 		
 		System.out.println("Finished...");
