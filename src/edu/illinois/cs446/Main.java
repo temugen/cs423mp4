@@ -58,5 +58,8 @@ public class Main {
 		for(Map.Entry<Integer, Integer> pair : result.entrySet()) {
 			System.out.println("<" + Integer.toHexString(pair.getKey()) + "," + pair.getValue() + ">");
 		}
+		
+		//Kill all threads
+		System.exit(0);
 	}
 }
