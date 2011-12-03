@@ -38,11 +38,14 @@ public class Worker extends Thread {
 		
 		long start = System.currentTimeMillis(), end;
 		for(Integer pixel : pixels) {
-			Integer count, updated;
+			if (result.putIfAbsent(pixel, 1) == null) {
+		        break;
+		    }
+			
+			Integer count;
 			do {
 				count = result.get(pixel);
-				updated = (count == null) ? 1 : (count + 1);
-			} while(!result.replace(pixel, count, updated));
+			} while(!result.replace(pixel, count, count + 1));
 		}
 		end = System.currentTimeMillis();
 		
