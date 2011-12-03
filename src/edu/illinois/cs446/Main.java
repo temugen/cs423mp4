@@ -3,15 +3,13 @@ package edu.illinois.cs446;
 import java.io.IOException;
 import java.nio.IntBuffer;
 import java.util.Map;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 
 public class Main {
 	private static Network network;
 	private static final JobQueue jobs = new JobQueue(1000);
 	private static final ResultMap result = new ResultMap();
-	private static final Lock bootstrapped = new ReentrantLock(), finished = new ReentrantLock();
+	private static TransferManager transferManager;
 	
 	private static void initClient(String host, int port) throws IOException {
 		//Split pixels in half
@@ -31,6 +29,12 @@ public class Main {
 	
 	private static void initServer(int port) throws IOException {
 		network = new Server(port);
+	}
+	
+	private static void waitForNextStep() throws InterruptedException {
+		synchronized(transferManager) {
+			transferManager.wait();
+		}
 	}
 
 	/**
@@ -52,13 +56,11 @@ public class Main {
 			initServer(new Integer(args[0]));
 		
 		//Start transfer manager
-		TransferManager transferManager = new TransferManager(network, jobs, result, bootstrapped, finished);
+		transferManager = new TransferManager(network, jobs, result);
 		transferManager.start();
 		
 		//Wait for bootstrap process to finish
-		synchronized (transferManager) {
-			transferManager.wait();
-		}
+		waitForNextStep();
 		
 		System.out.println("Bootstrapped...");
 		
@@ -71,16 +73,12 @@ public class Main {
 			network.write("finished_syn");
 			
 			//Wait for results to be transferred and print results
-			synchronized (transferManager) {
-				transferManager.wait();
-			}
+			waitForNextStep();
 			for(Map.Entry<Integer, Integer> pair : result.entrySet())
 				System.out.println("<" + Integer.toHexString(pair.getKey()) + "," + pair.getValue() + ">");
 		}
 		else {
-			synchronized (transferManager) {
-				transferManager.wait();
-			}
+			waitForNextStep();
 		}
 		
 		System.out.println("Finished...");

@@ -3,21 +3,17 @@ package edu.illinois.cs446;
 import java.io.IOException;
 import java.nio.IntBuffer;
 import java.util.Map;
-import java.util.concurrent.locks.Lock;
 
 
 public class TransferManager extends Thread {
 	private Network network;
 	private JobQueue jobs;
 	private ResultMap result;
-	private Lock bootstrapped, finished;
 	
-	public TransferManager(Network network, JobQueue jobs, ResultMap result, Lock bootstrapped, Lock finished) {
+	public TransferManager(Network network, JobQueue jobs, ResultMap result) {
 		this.network = network;
 		this.jobs = jobs;
 		this.result = result;
-		this.bootstrapped = bootstrapped;
-		this.finished = finished;
 	}
 	
 	private String getMessage() {
@@ -53,6 +49,12 @@ public class TransferManager extends Thread {
 		}
 	}
 	
+	private void signalStep() {
+		synchronized (this) {
+			notifyAll();
+		}
+	}
+	
 	public void run() {
 		while(true) {
 			String line = getMessage();
@@ -62,27 +64,26 @@ public class TransferManager extends Thread {
 			if(line.equals("bootstrapped_syn")) {
 				readPixels();
 				network.write("bootstrapped_ack");
-				synchronized (this) {
-					notifyAll();
-				}
+				signalStep();
 			}
 			else if(line.equals("bootstrapped_ack")) {
-				synchronized (this) {
-					notifyAll();
-				}
+				signalStep();
 			}
 			else if(line.equals("finished_syn")) {
 				network.write("finished_ack");
 				writeResult();
-				synchronized (this) {
-					notifyAll();
-				}
+				signalStep();
 			}
 			else if(line.equals("finished_ack")) {
 				readResult();
-				synchronized (this) {
-					notifyAll();
-				}
+				signalStep();
+			}
+			else if(line.equals("pixels_syn")) {
+				readPixels();
+				network.write("pixels_ack");
+			}
+			else if(line.equals("pixels_ack")) {
+				
 			}
 		}
 	}
