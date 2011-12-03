@@ -31,6 +31,7 @@ public class Main {
 		images.load("/Users/temugen/Desktop/images");
 		IntBuffer pixels = images.getPixels();
 		IntBuffer remote = splitPixels(pixels);
+		jobs.add(pixels);
 		
 		//Send half of the data to the server
 		network = new Client(host, port);
