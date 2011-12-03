@@ -1,14 +1,14 @@
 package edu.illinois.cs446;
 
 import java.nio.IntBuffer;
-import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-public class JobQueue {
+public class JobQueue extends ConcurrentLinkedQueue<int[]> {
+	private static final long serialVersionUID = 1L;
 	private int jobSize;
-	private Queue<int[]> queue = new ConcurrentLinkedQueue<int[]>();
 	
 	public JobQueue(int jobSize) {
+		super();
 		this.jobSize = jobSize;
 	}
 	
@@ -18,8 +18,7 @@ public class JobQueue {
 			int[] newJob;
 			newJob = new int[Math.min(jobSize, buffer.remaining())];
 			buffer.get(newJob);
-			queue.add(newJob);
+			super.add(newJob);
 		}
-		System.out.println(queue.size());
 	}
 }
