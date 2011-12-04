@@ -16,7 +16,7 @@ public class Worker extends Thread {
 	@Override
 	public void run() {
 		while(true) {
-			float throttle = stateManager.getThrottle();
+			float throttle = stateManager.getLocalThrottle();
 			long workTime = doWork();
 			long sleepTime = (long)(workTime * ((1.0f - throttle) / throttle));
 			jobTime = workTime + sleepTime;

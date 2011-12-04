@@ -9,7 +9,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 
-public class StateManager {
+public class StateManager extends Thread {
 	private Network network;
 	private JobQueue jobs;
 	private float throttle;
@@ -29,13 +29,13 @@ public class StateManager {
 		
 		@Override
 		public void run() {
-			stateManager.writeInt(stateManager.getState());
-			stateManager.writeInt(stateManager.getScaling());
-			stateManager.writeFloat(stateManager.getThrottle());
-			stateManager.writeInt(stateManager.getCpuUsage());
-			stateManager.writeInt(stateManager.getJobTime());
-		}
-		
+			stateManager.writeMessage("state");
+			stateManager.writeInt(stateManager.getLocalState());
+			stateManager.writeInt(stateManager.getLocalScaling());
+			stateManager.writeFloat(stateManager.getLocalThrottle());
+			stateManager.writeInt(stateManager.getLocalCpuUsage());
+			stateManager.writeInt(stateManager.getLocalJobTime());
+		}	
 	}
 	
 	public StateManager(Network network, JobQueue jobs, long period, float throttle) throws IOException {
@@ -87,19 +87,19 @@ public class StateManager {
 		writeLock.unlock();
 	}
 	
-	public float getThrottle() {
+	public float getLocalThrottle() {
 		return throttle;
 	}
 	
-	public int getScaling() {
-		return Math.max(1, hardwareMonitor.getCpuUsage()) * Math.max(1, (int)((1.0f - throttle) * 100)) * Math.max(1, getJobTime());
+	public int getLocalScaling() {
+		return Math.max(1, hardwareMonitor.getCpuUsage()) * Math.max(1, (int)((1.0f - throttle) * 100)) * Math.max(1, getLocalJobTime());
 	}
 
-	public int getState() {
-		return jobs.size() * getScaling();
+	public int getLocalState() {
+		return jobs.size() * getLocalScaling();
 	}
 	
-	public int getJobTime() {
+	public int getLocalJobTime() {
 		int count = workers.size();
 		if(count == 0)
 			return 0;
@@ -110,7 +110,7 @@ public class StateManager {
 		return (int)(totalTime / count);
 	}
 	
-	public int getCpuUsage() {
+	public int getLocalCpuUsage() {
 		return hardwareMonitor.getCpuUsage();
 	}
 	
@@ -131,11 +131,23 @@ public class StateManager {
 	}
 	
 	public int getRemoteState() {
-		remoteState = readInt();
-		remoteScaling = readInt();
-		remoteThrottle = readFloat();
-		remoteCpuUsage = readInt();
-		remoteJobTime = readInt();
 		return remoteState;
+	}
+	
+	@Override
+	public void run() {
+		while(true) {
+			String line = readMessage();
+			if(line == null)
+				continue;
+			
+			if(line.equals("state")) {
+				remoteState = readInt();
+				remoteScaling = readInt();
+				remoteThrottle = readFloat();
+				remoteCpuUsage = readInt();
+				remoteJobTime = readInt();
+			}
+		}
 	}
 }
