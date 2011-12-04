@@ -58,7 +58,7 @@ public class TransferManager extends Thread {
 				return i;
 			
 			transferStart = System.currentTimeMillis();
-			writeMessage("job_push");
+			writeMessage("job_syn");
 			writeInt(pixels.length);
 			for(int pixel : pixels)
 				writeInt(pixel);
