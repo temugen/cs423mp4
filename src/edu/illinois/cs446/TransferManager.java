@@ -12,6 +12,7 @@ public class TransferManager extends Thread {
 	private JobQueue jobs;
 	private ResultMap result;
 	private Lock writeLock = new ReentrantLock();
+	private long transferStart, transferTime = 0;
 	
 	public TransferManager(Network network, JobQueue jobs, ResultMap result) throws IOException {
 		this.network = network;
@@ -21,6 +22,10 @@ public class TransferManager extends Thread {
 		if(!network.isConnected())
 			network.connect();
 		System.out.println("> TransferManager connected");
+	}
+	
+	public long getTransferTime() {
+		return transferTime;
 	}
 	
 	private String readMessage() {
@@ -52,6 +57,7 @@ public class TransferManager extends Thread {
 			if(pixels == null)
 				return i;
 			
+			transferStart = System.currentTimeMillis();
 			writeMessage("job_push");
 			writeInt(pixels.length);
 			for(int pixel : pixels)
@@ -119,8 +125,12 @@ public class TransferManager extends Thread {
 				readResult();
 				signalStep();
 			}
-			else if(line.equals("job_push")) {
+			else if(line.equals("job_syn")) {
 				readJob();
+				writeMessage("job_ack");
+			}
+			else if(line.equals("job_ack")) {
+				transferTime = System.currentTimeMillis() - transferStart;
 			}
 			else if(line.equals("job_pull")) {
 				pushJobs(readInt());

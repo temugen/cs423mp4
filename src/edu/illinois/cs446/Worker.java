@@ -5,6 +5,7 @@ public class Worker extends Thread {
 	private JobQueue jobs;
 	private ResultMap result;
 	private StateManager stateManager;
+	private long workTime = 0;
 	
 	public Worker(JobQueue jobs, ResultMap result, StateManager stateManager) {
 		this.jobs = jobs;
@@ -16,8 +17,8 @@ public class Worker extends Thread {
 	public void run() {
 		while(true) {
 			float throttle = stateManager.getThrottle();
-			long time = doWork();
-			long sleepTime = (long)(time * ((1.0f-throttle) / throttle));
+			workTime = doWork();
+			long sleepTime = calculateSleepTime(workTime, throttle);
 			try {
 				Thread.sleep(sleepTime);
 			} catch (InterruptedException e) {
@@ -42,5 +43,17 @@ public class Worker extends Thread {
 		end = System.currentTimeMillis();
 		
 		return (end - start);
+	}
+	
+	private static long calculateSleepTime(long workTime, float throttle) {
+		return (long)(workTime * ((1.0f-throttle) / throttle));
+	}
+	
+	public static long getTotalTime(long workTime, float throttle) {
+		return workTime + calculateSleepTime(workTime, throttle);
+	}
+	
+	public long getWorkTime() {
+		return workTime;
 	}
 }

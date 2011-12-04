@@ -73,13 +73,34 @@ public class Adaptor {
 		//Dynamically push or pull jobs based on local and remote state
 		while(isMaster) {
 			int remoteState = stateManager.getRemoteState();
-			int localState = stateManager.getLocalState();
-			int remoteScaling = stateManager.getRemoteScaling();
-			int localScaling = stateManager.getLocalScaling();
+			int state = stateManager.getState();
 			
-			if(remoteState == 0 && localState == 0) {
+			//There is no more work left
+			if(remoteState == 0 && state == 0) {
 				transferManager.writeMessage("result_syn");
 				break;
+			}
+			
+			//Calculate the ideal number of jobs to transfer in order to balance
+			int remoteScaling = stateManager.getRemoteScaling();
+			int scaling = stateManager.getScaling();
+			int transferCount = (state - remoteState) / (scaling + remoteScaling);
+			if(transferCount == 0)
+				continue;
+			
+			//Adjust transferCount to minimize the combined transfer and processing time
+			boolean negative = transferCount < 0;
+			transferCount = Math.abs(transferCount);
+			long workTime = Worker.getTotalTime(worker.getWorkTime(), stateManager.getThrottle());
+			long remoteWorkTime = Worker.getTotalTime(worker.getWorkTime(), stateManager.getRemoteThrottle());
+			long transferTime = transferManager.getTransferTime();
+			if(negative) {
+				transferCount = (int)Math.floor(transferCount / ((transferTime / remoteWorkTime) + 1));
+				transferManager.pullJobs(transferCount);
+			}
+			else {
+				transferCount = (int)Math.floor(transferCount / ((transferTime / workTime) + 1));
+				transferManager.pushJobs(transferCount);
 			}
 		}
 		

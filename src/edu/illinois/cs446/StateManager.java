@@ -15,6 +15,7 @@ public class StateManager {
 	private Lock writeLock = new ReentrantLock();
 	private HardwareMonitor hardwareMonitor;
 	private int remoteState, remoteScaling;
+	private float remoteThrottle;
 	
 	private class SendStateTask extends TimerTask {
 		private StateManager stateManager;
@@ -25,7 +26,9 @@ public class StateManager {
 		
 		@Override
 		public void run() {
-			stateManager.writeInt(stateManager.getLocalState());
+			stateManager.writeInt(stateManager.getState());
+			stateManager.writeInt(stateManager.getScaling());
+			stateManager.writeFloat(stateManager.getThrottle());
 		}
 		
 	}
@@ -42,10 +45,6 @@ public class StateManager {
 		
 		if(network instanceof Server)
 			timer.scheduleAtFixedRate(new SendStateTask(this), 0, period);
-	}
-	
-	public float getThrottle() {
-		return throttle;
 	}
 	
 	private String readMessage() {
@@ -65,27 +64,44 @@ public class StateManager {
 		return Integer.parseInt(readMessage(), Character.MAX_RADIX);
 	}
 	
+	public void writeFloat(float num) {
+		writeMessage(Float.toString(num));
+	}
+	
+	public float readFloat() {
+		return Float.parseFloat(readMessage());
+	}
+	
 	public void writeMessage(String message) {
 		writeLock.lock();
 		network.write(message);
 		writeLock.unlock();
 	}
 	
-	public int getLocalScaling() {
+	public float getThrottle() {
+		return throttle;
+	}
+	
+	public int getScaling() {
 		return Math.max(1, hardwareMonitor.getCpuUsage()) * Math.max(1, (int)((1 - throttle) * 100));
+	}
+
+	public int getState() {
+		return jobs.size() * getScaling();
+	}
+	
+	public float getRemoteThrottle() {
+		return remoteThrottle;
 	}
 	
 	public int getRemoteScaling() {
 		return remoteScaling;
 	}
 	
-	public int getLocalState() {
-		return jobs.size() * getLocalScaling();
-	}
-	
 	public int getRemoteState() {
 		remoteState = readInt();
 		remoteScaling = readInt();
+		remoteThrottle = readFloat();
 		return remoteState;
 	}
 }
