@@ -1,6 +1,8 @@
 package edu.illinois.cs446;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.locks.Lock;
@@ -14,8 +16,9 @@ public class StateManager {
 	private Timer timer = new Timer();
 	private Lock writeLock = new ReentrantLock();
 	private HardwareMonitor hardwareMonitor;
-	private int remoteState = 1, remoteScaling = 1;
+	private int remoteState = 1, remoteScaling = 1, remoteCpuUsage = 1, remoteJobTime = 1;
 	private float remoteThrottle = 1.0f;
+	private List<Worker> workers = new ArrayList<Worker>();
 	
 	private class SendStateTask extends TimerTask {
 		private StateManager stateManager;
@@ -29,6 +32,8 @@ public class StateManager {
 			stateManager.writeInt(stateManager.getState());
 			stateManager.writeInt(stateManager.getScaling());
 			stateManager.writeFloat(stateManager.getThrottle());
+			stateManager.writeInt(stateManager.getCpuUsage());
+			stateManager.writeInt(stateManager.getJobTime());
 		}
 		
 	}
@@ -83,11 +88,26 @@ public class StateManager {
 	}
 	
 	public int getScaling() {
-		return Math.max(1, hardwareMonitor.getCpuUsage()) * Math.max(1, (int)((1 - throttle) * 100));
+		return Math.max(1, hardwareMonitor.getCpuUsage()) * Math.max(1, (int)((1.0f - throttle) * 100)) * Math.max(1, getJobTime());
 	}
 
 	public int getState() {
 		return jobs.size() * getScaling();
+	}
+	
+	public int getJobTime() {
+		int count = workers.size();
+		if(count == 0)
+			return 0;
+		
+		long totalTime = 0;
+		for(Worker worker: workers)
+			totalTime += worker.getJobTime();
+		return (int)(totalTime / count);
+	}
+	
+	public int getCpuUsage() {
+		return hardwareMonitor.getCpuUsage();
 	}
 	
 	public float getRemoteThrottle() {
@@ -98,10 +118,20 @@ public class StateManager {
 		return remoteScaling;
 	}
 	
+	public int getRemoteJobTime() {
+		return remoteJobTime;
+	}
+	
+	public int getRemoteCpuUsage() {
+		return remoteCpuUsage;
+	}
+	
 	public int getRemoteState() {
 		remoteState = readInt();
 		remoteScaling = readInt();
 		remoteThrottle = readFloat();
+		remoteCpuUsage = readInt();
+		remoteJobTime = readInt();
 		return remoteState;
 	}
 }

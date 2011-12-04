@@ -6,7 +6,7 @@ import java.util.Map;
 
 public class Adaptor {
 	private static final int jobSize = 1000;
-	private static float throttle = 0.7f;
+	private static float throttle = 1.0f;
 	private static final long statePeriod = 100;
 	
 	private static final JobQueue jobs = new JobQueue(jobSize);
@@ -91,18 +91,18 @@ public class Adaptor {
 			//Adjust transferCount to minimize the combined transfer and processing time
 			boolean negative = transferCount < 0;
 			transferCount = Math.abs(transferCount);
-			long workTime = Worker.getTotalTime(worker.getWorkTime(), stateManager.getThrottle());
-			long remoteWorkTime = Worker.getTotalTime(worker.getWorkTime(), stateManager.getRemoteThrottle());
+			long jobTime = stateManager.getJobTime();
+			long remoteJobTime = stateManager.getRemoteJobTime();
 			long transferTime = transferManager.getTransferTime();
 			if(negative) {
-				if(transferTime != 0 && remoteWorkTime != 0)
-					transferCount = (int)Math.floor(transferCount / ((transferTime / remoteWorkTime) + 1));
+				if(transferTime != 0 && remoteJobTime != 0)
+					transferCount = (int)Math.floor(transferCount / ((transferTime / remoteJobTime) + 1));
 				transferManager.pullJobs(transferCount);
 				System.out.println("> Pulled " + transferCount + " jobs");
 			}
 			else {
-				if(transferTime != 0 && workTime != 0)
-					transferCount = (int)Math.floor(transferCount / ((transferTime / workTime) + 1));
+				if(transferTime != 0 && jobTime != 0)
+					transferCount = (int)Math.floor(transferCount / ((transferTime / jobTime) + 1));
 				transferManager.pushJobs(transferCount);
 				System.out.println("> Pushed " + transferCount + " jobs");
 			}
