@@ -4,7 +4,7 @@ package edu.illinois.cs446;
 public class Worker extends Thread {
 	private JobQueue jobs;
 	private ResultMap result;
-	private float throttle = 1.0f;
+	private float throttle;
 	
 	public Worker(JobQueue jobs, ResultMap result, float throttle) {
 		this.jobs = jobs;
@@ -12,6 +12,7 @@ public class Worker extends Thread {
 		this.throttle = throttle;
 	}
 	
+	@Override
 	public void run() {
 		while(true) {
 			long time = doWork();

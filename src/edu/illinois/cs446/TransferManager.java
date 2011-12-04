@@ -3,12 +3,15 @@ package edu.illinois.cs446;
 import java.io.IOException;
 import java.nio.IntBuffer;
 import java.util.Map;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 
 public class TransferManager extends Thread {
 	private Network network;
 	private JobQueue jobs;
 	private ResultMap result;
+	private Lock writeLock = new ReentrantLock();
 	
 	public TransferManager(Network network, JobQueue jobs, ResultMap result) {
 		this.network = network;
@@ -16,7 +19,7 @@ public class TransferManager extends Thread {
 		this.result = result;
 	}
 	
-	private String getMessage() {
+	private String readMessage() {
 		try {
 			return network.read();
 		} catch (IOException e) {
@@ -25,31 +28,55 @@ public class TransferManager extends Thread {
 		}
 	}
 	
-	public void writeMessage(String message) {
-		network.write(message);
+	public void writeInt(int num) {
+		writeMessage(Integer.toString(num, Character.MAX_RADIX));
 	}
 	
-	private void readPixels() {
-		int count = new Integer(getMessage());
+	public int readInt() {
+		return Integer.parseInt(readMessage(), Character.MAX_RADIX);
+	}
+	
+	public void writeMessage(String message) {
+		writeLock.lock();
+		network.write(message);
+		writeLock.unlock();
+	}
+	
+	public int sendJobs(int count) {
+		for(int i = 0; i < count; i++) {
+			int[] pixels = jobs.poll();
+			if(pixels == null)
+				return i;
+			
+			writeMessage("job");
+			writeInt(pixels.length);
+			for(int pixel : pixels)
+				writeInt(pixel);
+		}
+		
+		return count;
+	}
+	
+	private void readJob() {
+		int count = new Integer(readMessage());
 		IntBuffer buffer = IntBuffer.allocate(count);
 		for(int i = 0; i < count; i++)
-			buffer.put(Integer.parseInt(getMessage(), Character.MAX_RADIX));
+			buffer.put(readInt());
 		jobs.add(buffer);
 	}
 	
 	private void writeResult() {
-		network.write(new Integer(result.size()).toString());
+		writeInt(result.size());
 		for(Map.Entry<Integer, Integer> pair : result.entrySet()) {
-			network.write(Integer.toString(pair.getKey(), Character.MAX_RADIX));
+			writeMessage(Integer.toString(pair.getKey(), Character.MAX_RADIX));
 		}
 	}
 	
 	private void readResult() {
-		int count = new Integer(getMessage());
+		int count = new Integer(readMessage());
 		for(int i = 0; i < count; i++) {
-			Integer key = Integer.parseInt(getMessage(), Character.MAX_RADIX);
-			Integer value = Integer.parseInt(getMessage(), Character.MAX_RADIX);
-			result.increment(key, value);
+			Integer pixel = readInt(), num = readInt();
+			result.increment(pixel, num);
 		}
 	}
 	
@@ -59,22 +86,22 @@ public class TransferManager extends Thread {
 		}
 	}
 	
+	@Override
 	public void run() {
 		while(true) {
-			String line = getMessage();
+			String line = readMessage();
 			if(line == null)
 				continue;
 			
 			if(line.equals("bootstrapped_syn")) {
-				readPixels();
-				network.write("bootstrapped_ack");
+				writeMessage("bootstrapped_ack");
 				signalStep();
 			}
 			else if(line.equals("bootstrapped_ack")) {
 				signalStep();
 			}
 			else if(line.equals("finished_syn")) {
-				network.write("finished_ack");
+				writeMessage("finished_ack");
 				writeResult();
 				signalStep();
 			}
@@ -82,12 +109,8 @@ public class TransferManager extends Thread {
 				readResult();
 				signalStep();
 			}
-			else if(line.equals("pixels_syn")) {
-				readPixels();
-				network.write("pixels_ack");
-			}
-			else if(line.equals("pixels_ack")) {
-				
+			else if(line.equals("job")) {
+				readJob();
 			}
 		}
 	}

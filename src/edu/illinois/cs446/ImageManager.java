@@ -31,23 +31,6 @@ public class ImageManager {
 		}
 	}
 	
-	public static IntBuffer[] splitPixels(IntBuffer pixels) {
-		int halfCapacity = pixels.capacity() / 2;
-		IntBuffer split[] = new IntBuffer[2];
-		split[0] = IntBuffer.allocate(halfCapacity);
-		split[1] = IntBuffer.allocate(pixels.capacity() - halfCapacity);
-		
-		pixels.rewind();
-		while(pixels.hasRemaining()) {
-			if(split[0].hasRemaining())
-				split[0].put(pixels.get());
-			else
-				split[1].put(pixels.get());
-		}
-		
-		return split;
-	}
-	
 	public IntBuffer getPixels() {
 		int size = getSize();
 		IntBuffer buff = IntBuffer.allocate(size);
