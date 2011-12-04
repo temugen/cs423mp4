@@ -150,7 +150,7 @@ public class Adaptor {
 			}
 			else {
 				transferManager.pullJobs(-transferCount);
-				System.out.println("> Pulled " + transferCount + " jobs");
+				System.out.println("> Pulled " + -transferCount + " jobs");
 			}
 			
 			Thread.sleep(statePeriod);
