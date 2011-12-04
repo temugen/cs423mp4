@@ -93,19 +93,19 @@ public class TransferManager extends Thread {
 			if(line == null)
 				continue;
 			
-			if(line.equals("bootstrapped_syn")) {
-				writeMessage("bootstrapped_ack");
+			if(line.equals("bootstrap_syn")) {
+				writeMessage("bootstrap_ack");
 				signalStep();
 			}
-			else if(line.equals("bootstrapped_ack")) {
+			else if(line.equals("bootstrap_ack")) {
 				signalStep();
 			}
-			else if(line.equals("finished_syn")) {
-				writeMessage("finished_ack");
+			else if(line.equals("result_syn")) {
+				writeMessage("result_ack");
 				writeResult();
 				signalStep();
 			}
-			else if(line.equals("finished_ack")) {
+			else if(line.equals("result_ack")) {
 				readResult();
 				signalStep();
 			}

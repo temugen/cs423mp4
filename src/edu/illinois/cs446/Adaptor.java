@@ -29,7 +29,7 @@ public class Adaptor {
 		transferManager.sendJobs(halfCount);
 		
 		stateManager = new StateManager(new Client(host, port + 1), jobs, statePeriod);
-		transferManager.writeMessage("bootstrapped_syn");
+		transferManager.writeMessage("bootstrap_syn");
 	}
 	
 	private static void initServer(int port) throws IOException {
@@ -75,7 +75,7 @@ public class Adaptor {
 			int localState = stateManager.getLocalState();
 			
 			if(remoteState == 0 && localState == 0) {
-				transferManager.writeMessage("finished_syn");
+				transferManager.writeMessage("result_syn");
 				break;
 			}
 		}
