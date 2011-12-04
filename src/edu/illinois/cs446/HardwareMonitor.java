@@ -26,7 +26,7 @@ public class HardwareMonitor {
 				while((line = input.readLine()) != null)
 					lastLine = line;
 				lastLine = lastLine.trim();
-				int start = lastLine.lastIndexOf(" ");
+				int start = lastLine.lastIndexOf(" ") + 1;
 				cpuUsage = 100 - Integer.parseInt(lastLine.substring(start));
 				System.out.println(cpuUsage);
 			} catch (IOException e) {
