@@ -95,11 +95,13 @@ public class Adaptor {
 			long remoteWorkTime = Worker.getTotalTime(worker.getWorkTime(), stateManager.getRemoteThrottle());
 			long transferTime = transferManager.getTransferTime();
 			if(negative) {
-				transferCount = (int)Math.floor(transferCount / ((transferTime / remoteWorkTime) + 1));
+				if(transferTime != 0 && remoteWorkTime != 0)
+					transferCount = (int)Math.floor(transferCount / ((transferTime / remoteWorkTime) + 1));
 				transferManager.pullJobs(transferCount);
 			}
 			else {
-				transferCount = (int)Math.floor(transferCount / ((transferTime / workTime) + 1));
+				if(transferTime != 0 && workTime != 0)
+					transferCount = (int)Math.floor(transferCount / ((transferTime / workTime) + 1));
 				transferManager.pushJobs(transferCount);
 			}
 		}

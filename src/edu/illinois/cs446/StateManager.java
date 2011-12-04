@@ -14,8 +14,8 @@ public class StateManager {
 	private Timer timer = new Timer();
 	private Lock writeLock = new ReentrantLock();
 	private HardwareMonitor hardwareMonitor;
-	private int remoteState, remoteScaling;
-	private float remoteThrottle;
+	private int remoteState = 1, remoteScaling = 1;
+	private float remoteThrottle = 1.0f;
 	
 	private class SendStateTask extends TimerTask {
 		private StateManager stateManager;
