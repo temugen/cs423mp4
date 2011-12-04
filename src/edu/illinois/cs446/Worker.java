@@ -19,9 +19,7 @@ public class Worker extends Thread {
 			float throttle = stateManager.getLocalThrottle();
 			long workTime = doWork();
 			long sleepTime = (long)(workTime * ((1.0f - throttle) / throttle));
-			long total = workTime + sleepTime;
-			if(total > 0)
-				jobTime = workTime + sleepTime;
+			jobTime = workTime + sleepTime;
 			try {
 				Thread.sleep(sleepTime);
 			} catch (InterruptedException e) {
