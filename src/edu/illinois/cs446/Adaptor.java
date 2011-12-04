@@ -34,9 +34,10 @@ public class Adaptor {
 		transferManager.writeMessage("bootstrap_syn");
 	}
 	
-	private static void initServer(int port) throws IOException {
+	private static void initServer(int port) throws IOException, InterruptedException {
 		transferManager = new TransferManager(new Server(port), jobs, result);
 		System.out.println("TransferManager connected...");
+		Thread.sleep(2000);
 		stateManager = new StateManager(new Server(port + 1), jobs, statePeriod, throttle);
 		System.out.println("StateManager connected...");
 	}
