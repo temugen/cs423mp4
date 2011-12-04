@@ -73,7 +73,7 @@ public class TransferManager extends Thread {
 	}
 	
 	private void readResult() {
-		int count = new Integer(readMessage());
+		int count = readInt();
 		for(int i = 0; i < count; i++) {
 			Integer pixel = readInt(), num = readInt();
 			result.increment(pixel, num);
