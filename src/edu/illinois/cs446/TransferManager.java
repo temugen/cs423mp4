@@ -51,6 +51,11 @@ public class TransferManager extends Thread {
 		writeLock.unlock();
 	}
 	
+	/**
+	 * Write out count number of jobs to the network
+	 * @param count
+	 * @return the number of jobs actually sent
+	 */
 	public int pushJobs(int count) {
 		for(int i = 0; i < count; i++) {
 			int[] pixels = jobs.poll();
@@ -67,11 +72,18 @@ public class TransferManager extends Thread {
 		return count;
 	}
 	
+	/**
+	 * Request count jobs to be sent
+	 * @param count
+	 */
 	public void pullJobs(int count) {
 		writeMessage("job_pull");
 		writeInt(count);
 	}
 	
+	/**
+	 * Add a job from the network into the local queue
+	 */
 	private void readJob() {
 		int count = readInt();
 		IntBuffer buffer = IntBuffer.allocate(count);
@@ -80,6 +92,9 @@ public class TransferManager extends Thread {
 		jobs.add(buffer);
 	}
 	
+	/**
+	 * Send our result map over the network
+	 */
 	private void writeResult() {
 		writeInt(result.size());
 		for(Map.Entry<Integer, Integer> pair : result.entrySet()) {
@@ -88,6 +103,9 @@ public class TransferManager extends Thread {
 		}
 	}
 	
+	/**
+	 * Add a result map to our local map
+	 */
 	private void readResult() {
 		int count = readInt();
 		for(int i = 0; i < count; i++) {
@@ -96,6 +114,10 @@ public class TransferManager extends Thread {
 		}
 	}
 	
+	/**
+	 * Notify all threads that the transfer manager has received
+	 * an important ACK
+	 */
 	private void signalStep() {
 		synchronized (this) {
 			notifyAll();

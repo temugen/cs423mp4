@@ -12,6 +12,10 @@ import java.awt.image.BufferedImage;
 public class ImageManager {
 	private List<BufferedImage> images = new ArrayList<BufferedImage>();
 	
+	/**
+	 * Load all of the images in a directory into a list
+	 * @param directory
+	 */
 	public void load(String directory) {
 		File dir = new File(directory);
 		File[] files = dir.listFiles();
@@ -31,6 +35,10 @@ public class ImageManager {
 		}
 	}
 	
+	/**
+	 *
+	 * @return the pixels corresponding to all of the images in our list
+	 */
 	public IntBuffer getPixels() {
 		int size = getSize();
 		IntBuffer buff = IntBuffer.allocate(size);
@@ -41,15 +49,15 @@ public class ImageManager {
 		return buff;
 	}
 	
+	/**
+	 * 
+	 * @return the total number of pixels all of our images have
+	 */
 	private int getSize() {
 		int size = 0;
 		for(BufferedImage image : images) {
 			size += image.getHeight() * image.getWidth();
 		}
 		return size;
-	}
-	
-	public void add(BufferedImage image) {
-		images.add(image);
 	}
 }

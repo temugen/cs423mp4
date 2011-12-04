@@ -20,11 +20,16 @@ public class GUI extends JFrame implements Runnable, ChangeListener {
 	private Timer timer = new Timer();
 	private int initialJobCount = 0;
 	
+	/**
+	 * This timer task updates a progress bar value with state from a StateManager
+	 * @author temugen
+	 *
+	 */
 	private class UpdateProgressTask extends TimerTask {
 		private StateManager stateManager;
 		private JProgressBar bar;
 		
-		public UpdateProgressTask(JFrame frame, StateManager stateManager, JProgressBar bar) {
+		public UpdateProgressTask(StateManager stateManager, JProgressBar bar) {
 			this.stateManager = stateManager;
 			this.bar = bar;
 		}
@@ -55,11 +60,14 @@ public class GUI extends JFrame implements Runnable, ChangeListener {
 		if(isMaster) {
 			bar.setMinimum(0);
 			bar.setMaximum(100);
-			timer.schedule(new UpdateProgressTask(this, stateManager, bar), 0, 100);
+			timer.schedule(new UpdateProgressTask(stateManager, bar), 0, 100);
 			getContentPane().add(bar);
 		}
 	}
 	
+	/**
+	 * Update the StateManager with the adjusted slider value for threshold
+	 */
 	public void stateChanged(ChangeEvent evt) {
 		JSlider slider = (JSlider) evt.getSource();
 		if (!slider.getValueIsAdjusting()) {
@@ -69,6 +77,10 @@ public class GUI extends JFrame implements Runnable, ChangeListener {
 		}
 	}
 	
+	/**
+	 * Draw the result image
+	 * @param image
+	 */
 	public void displayResult(BufferedImage image) {
 		getGraphics().drawImage(image, this.getWidth() / 2 - image.getWidth() / 2, this.getHeight() - image.getHeight() - 10, null);
 	}

@@ -11,11 +11,13 @@ public class HardwareMonitor {
 	private Timer timer = new Timer();
 	private CollectHardwareInfoTask collectHardwareInfoTask = new CollectHardwareInfoTask();
 	
+	/**
+	 * This timer task reads the cpu idle from sar and inverts it
+	 * @author temugen
+	 *
+	 */
 	private class CollectHardwareInfoTask extends TimerTask {
 		protected int cpuUsage = 100;
-		
-		public CollectHardwareInfoTask() {
-		}
 		
 		@Override
 		public void run() {
@@ -35,6 +37,10 @@ public class HardwareMonitor {
 		}	
 	}
 	
+	/**
+	 * Sets a timer with a given period to collect cpu usage
+	 * @param period
+	 */
 	public HardwareMonitor(long period) {
 		timer.scheduleAtFixedRate(collectHardwareInfoTask, 0, period);
 	}

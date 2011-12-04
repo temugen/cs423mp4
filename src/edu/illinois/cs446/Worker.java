@@ -28,6 +28,10 @@ public class Worker extends Thread {
 		}
 	}
 	
+	/**
+	 * Read in all of the pixels in a job and increment their result values
+	 * @return the time it takes to process the job
+	 */
 	public long doWork() {
 		int[] pixels = null;
 		

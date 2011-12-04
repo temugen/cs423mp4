@@ -13,6 +13,10 @@ public class JobQueue extends LinkedBlockingQueue<int[]> {
 		this.jobSize = jobSize;
 	}
 	
+	/**
+	 * Chunk a buffer into jobs of jobSize and add them to our queue
+	 * @param buffer
+	 */
 	public void add(IntBuffer buffer) {
 		buffer.rewind();
 		while(buffer.hasRemaining()) {

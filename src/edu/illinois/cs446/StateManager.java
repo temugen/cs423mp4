@@ -22,6 +22,11 @@ public class StateManager extends Thread {
 	private long period;
 	private boolean isValid = false;
 	
+	/**
+	 * This timer task sends out current node state over the network
+	 * @author temugen
+	 *
+	 */
 	private class SendStateTask extends TimerTask {
 		private StateManager stateManager;
 		
@@ -53,6 +58,10 @@ public class StateManager extends Thread {
 		System.out.println("> StateManager connected");
 	}
 	
+	/**
+	 * Add worker to our list of workers to read job time from
+	 * @param worker
+	 */
 	public void addWorker(Worker worker) {
 		workers.add(worker);
 	}
@@ -104,6 +113,10 @@ public class StateManager extends Thread {
 		return jobs.size() * getLocalScaling();
 	}
 	
+	/**
+	 * 
+	 * @return average of worker job time
+	 */
 	public int getLocalJobTime() {
 		int count = workers.size();
 		if(count == 0)

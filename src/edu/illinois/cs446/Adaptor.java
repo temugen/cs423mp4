@@ -19,6 +19,12 @@ public class Adaptor {
 	private static boolean isMaster = false;
 	private static GUI gui;
 	
+	/**
+	 * Initialize a client (master) to connect to server (slave) at host on port
+	 * @param host
+	 * @param port
+	 * @throws IOException
+	 */
 	private static void initClient(String host, int port) throws IOException {
 		isMaster = true;
 	
@@ -40,6 +46,11 @@ public class Adaptor {
 		transferManager.writeMessage("bootstrap_syn");
 	}
 	
+	/**
+	 * Initialize a server (slave) on port
+	 * @param port
+	 * @throws IOException
+	 */
 	private static void initServer(int port) throws IOException {
 		transferManager = new TransferManager(new Server(port), jobs, result);
 		transferManager.start();
@@ -49,6 +60,9 @@ public class Adaptor {
 		new Thread(gui).start();
 	}
 	
+	/**
+	 * Create multiple workers to exploit multiple cores/CPUs
+	 */
 	private static void initWorkers() {
 		for(int i = 0; i < workers; i++) {
 			Worker worker = new Worker(jobs, result, stateManager);
@@ -57,12 +71,20 @@ public class Adaptor {
 		}
 	}
 	
+	/**
+	 * Wait for an ACK from the transferManager
+	 * @throws InterruptedException
+	 */
 	private static void waitForNextStep() throws InterruptedException {
 		synchronized(transferManager) {
 			transferManager.wait();
 		}
 	}
 	
+	/**
+	 * Prints out the key value pairs of our ResultMap and attempts to 
+	 * make an image of the pairs which is drawn on the GUI
+	 */
 	private static void displayResult() {
 		int width = 300, height = 400;
 		BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
@@ -88,12 +110,20 @@ public class Adaptor {
 		gui.displayResult(image);
 	}
 	
+	/**
+	 * 
+	 * @return whether the local nor remote nodes have any jobs left 
+	 */
 	private static boolean isComplete() {
 		int remoteState = stateManager.getRemoteState();
 		int state = stateManager.getLocalState();
 		return (remoteState == 0 && state == 0);
 	}
 	
+	/**
+	 * 
+	 * @return the number of jobs that will balance the nodes given instant network speed
+	 */
 	private static int getIdealTransferCount() {
 		int remoteState = stateManager.getRemoteState();
 		int state = stateManager.getLocalState();
@@ -103,6 +133,11 @@ public class Adaptor {
 		return transferCount;
 	}
 	
+	/**
+	 * 
+	 * @param transferCount
+	 * @return adjust the number of jobs to transfer based on network and job processing speed
+	 */
 	private static int smoothTransferCount(int transferCount) {
 		boolean negative = transferCount < 0;
 		transferCount = Math.abs(transferCount);
