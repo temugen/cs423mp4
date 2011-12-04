@@ -98,6 +98,7 @@ public class Adaptor {
 			int scaling = stateManager.getLocalScaling();
 			int transferCount = (state - remoteState) / (scaling + remoteScaling);
 			System.out.println("remoteScaling: " + remoteScaling + ", scaling: " + scaling);
+			System.out.println("remoteCpu: " + stateManager.getRemoteCpuUsage() + " Cpu: " + stateManager.getLocalCpuUsage());
 			if(transferCount == 0)
 				continue;
 			
