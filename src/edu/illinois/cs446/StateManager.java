@@ -10,7 +10,7 @@ import java.util.concurrent.locks.ReentrantLock;
 public class StateManager {
 	private Network network;
 	private JobQueue jobs;
-	private Timer timer;
+	private Timer timer = new Timer();
 	private Lock writeLock = new ReentrantLock();
 	private static final HardwareMonitor hardwareMonitor = new HardwareMonitor();
 	
