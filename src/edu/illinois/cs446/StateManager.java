@@ -14,6 +14,7 @@ public class StateManager {
 	private Timer timer = new Timer();
 	private Lock writeLock = new ReentrantLock();
 	private HardwareMonitor hardwareMonitor;
+	private int remoteState, remoteScaling;
 	
 	private class SendStateTask extends TimerTask {
 		private StateManager stateManager;
@@ -70,11 +71,21 @@ public class StateManager {
 		writeLock.unlock();
 	}
 	
+	public int getLocalScaling() {
+		return Math.max(1, hardwareMonitor.getCpuUsage()) * Math.max(1, (int)((1 - throttle) * 100));
+	}
+	
+	public int getRemoteScaling() {
+		return remoteScaling;
+	}
+	
 	public int getLocalState() {
-		return jobs.size() * hardwareMonitor.getCpuUsage() * (int)((1 - throttle) * 100);
+		return jobs.size() * getLocalScaling();
 	}
 	
 	public int getRemoteState() {
-		return readInt();
+		remoteState = readInt();
+		remoteScaling = readInt();
+		return remoteState;
 	}
 }

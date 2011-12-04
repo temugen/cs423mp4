@@ -74,6 +74,8 @@ public class Adaptor {
 		while(isMaster) {
 			int remoteState = stateManager.getRemoteState();
 			int localState = stateManager.getLocalState();
+			int remoteScaling = stateManager.getRemoteScaling();
+			int localScaling = stateManager.getLocalScaling();
 			
 			if(remoteState == 0 && localState == 0) {
 				transferManager.writeMessage("result_syn");
