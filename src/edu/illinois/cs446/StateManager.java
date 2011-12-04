@@ -31,6 +31,8 @@ public class StateManager extends Thread {
 		@Override
 		public void run() {
 			stateManager.writeMessage("state");
+			System.out.println(stateManager.getLocalState());
+			System.out.println(stateManager.getLocalJobTime());
 			stateManager.writeInt(stateManager.getLocalState());
 			stateManager.writeInt(stateManager.getLocalScaling());
 			stateManager.writeFloat(stateManager.getLocalThrottle());
