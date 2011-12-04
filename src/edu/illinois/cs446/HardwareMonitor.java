@@ -28,7 +28,6 @@ public class HardwareMonitor {
 				lastLine = lastLine.trim();
 				int start = lastLine.lastIndexOf(" ") + 1;
 				cpuUsage = 100 - (int)Float.parseFloat(lastLine.substring(start));
-				System.out.println(cpuUsage);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
