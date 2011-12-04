@@ -21,7 +21,9 @@ public class Adaptor {
 		isMaster = true;
 	
 		transferManager = new TransferManager(new Client(host, port), jobs, result);
+		transferManager.start();
 		stateManager = new StateManager(new Client(host, port + 1), jobs, statePeriod, throttle);
+		stateManager.start();
 		
 		//Load all of the jobs
 		ImageManager images = new ImageManager();
@@ -36,7 +38,17 @@ public class Adaptor {
 	
 	private static void initServer(int port) throws IOException {
 		transferManager = new TransferManager(new Server(port), jobs, result);
+		transferManager.start();
 		stateManager = new StateManager(new Server(port + 1), jobs, statePeriod, throttle);
+		stateManager.start();
+	}
+	
+	private static void initWorkers() {
+		for(int i = 0; i < workers; i++) {
+			Worker worker = new Worker(jobs, result, stateManager);
+			stateManager.addWorker(worker);
+			worker.start();
+		}
 	}
 	
 	private static void waitForNextStep() throws InterruptedException {
@@ -63,20 +75,13 @@ public class Adaptor {
 			initClient(args[0], new Integer(args[1]));
 		else
 			initServer(new Integer(args[0]));
-		transferManager.start();
 		waitForNextStep();
 		System.out.println("> Bootstrapped");
 		
-		//Start worker threads
-		for(int i = 0; i < workers; i++) {
-			Worker worker = new Worker(jobs, result, stateManager);
-			stateManager.addWorker(worker);
-			worker.start();
-		}
+		initWorkers();
 		System.out.println("> Started Worker threads");
 		
 		//Dynamically push or pull jobs based on local and remote state
-		stateManager.start();
 		while(isMaster) {
 			
 			//We don't have valid state yet
