@@ -23,12 +23,10 @@ public class GUI extends JFrame implements Runnable, ChangeListener {
 	private class UpdateProgressTask extends TimerTask {
 		private StateManager stateManager;
 		private JProgressBar bar;
-		private JFrame frame;
 		
 		public UpdateProgressTask(JFrame frame, StateManager stateManager, JProgressBar bar) {
 			this.stateManager = stateManager;
 			this.bar = bar;
-			this.frame = frame;
 		}
 		
 		@Override
