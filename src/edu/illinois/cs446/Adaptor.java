@@ -17,6 +17,11 @@ public class Adaptor {
 	
 	private static void initClient(String host, int port) throws IOException {
 		isMaster = true;
+	
+		transferManager = new TransferManager(new Client(host, port), jobs, result);
+		System.out.println("TransferManager connected...");
+		stateManager = new StateManager(new Client(host, port + 1), jobs, statePeriod, throttle);
+		System.out.println("StateManager connected...");
 		
 		//Load all of the jobs
 		ImageManager images = new ImageManager();
@@ -25,16 +30,15 @@ public class Adaptor {
 		
 		//Send half of the data to the server
 		int halfCount = jobs.size() / 2;
-		transferManager = new TransferManager(new Client(host, port), jobs, result);
 		transferManager.sendJobs(halfCount);
-		
-		stateManager = new StateManager(new Client(host, port + 1), jobs, statePeriod, throttle);
 		transferManager.writeMessage("bootstrap_syn");
 	}
 	
 	private static void initServer(int port) throws IOException {
 		transferManager = new TransferManager(new Server(port), jobs, result);
+		System.out.println("TransferManager connected...");
 		stateManager = new StateManager(new Server(port + 1), jobs, statePeriod, throttle);
+		System.out.println("StateManager connected...");
 	}
 	
 	private static void waitForNextStep() throws InterruptedException {
@@ -60,7 +64,6 @@ public class Adaptor {
 		else
 			initServer(new Integer(args[0]));
 		transferManager.start();
-		System.out.println("TransferManager and StateManager loaded...");
 		waitForNextStep();
 		System.out.println("Bootstrapped...");
 		
