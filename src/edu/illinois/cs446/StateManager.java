@@ -16,7 +16,7 @@ public class StateManager extends Thread {
 	private Timer timer = new Timer();
 	private Lock writeLock = new ReentrantLock();
 	private HardwareMonitor hardwareMonitor;
-	private int remoteState = 0, remoteScaling = 0, remoteCpuUsage = 0, remoteJobTime = 0;
+	private int remoteState = 0, remoteScaling = 0, remoteCpuUsage = 0, remoteJobTime = 0, remoteJobsLeft = 0;
 	private float remoteThrottle = 0.0f;
 	private List<Worker> workers = new ArrayList<Worker>();
 	private long period;
@@ -37,6 +37,7 @@ public class StateManager extends Thread {
 			stateManager.writeFloat(stateManager.getLocalThrottle());
 			stateManager.writeInt(stateManager.getLocalCpuUsage());
 			stateManager.writeInt(stateManager.getLocalJobTime());
+			stateManager.writeInt(stateManager.getLocalJobsLeft());
 		}	
 	}
 	
@@ -114,6 +115,10 @@ public class StateManager extends Thread {
 		return hardwareMonitor.getCpuUsage();
 	}
 	
+	public int getLocalJobsLeft() {
+		return jobs.size();
+	}
+	
 	public float getRemoteThrottle() {
 		return remoteThrottle;
 	}
@@ -132,6 +137,10 @@ public class StateManager extends Thread {
 	
 	public int getRemoteState() {
 		return remoteState;
+	}
+	
+	public int getRemoteJobsLeft() {
+		return remoteJobsLeft;
 	}
 	
 	public boolean isValid() {
@@ -154,6 +163,7 @@ public class StateManager extends Thread {
 				remoteThrottle = readFloat();
 				remoteCpuUsage = readInt();
 				remoteJobTime = readInt();
+				remoteJobsLeft = readInt();
 				isValid = true;
 			}
 		}
