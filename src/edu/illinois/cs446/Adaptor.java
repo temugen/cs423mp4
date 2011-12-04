@@ -5,8 +5,8 @@ import java.util.Map;
 
 
 public class Adaptor {
-	private static final int jobSize = 1000;
-	private static float throttle = 0.01f;
+	private static final int jobSize = 10000;
+	private static float throttle = 0.25f;
 	private static final long statePeriod = 100;
 	private static final int threshold = 100;
 	
@@ -85,8 +85,6 @@ public class Adaptor {
 			int remoteState = stateManager.getRemoteState();
 			int state = stateManager.getLocalState();
 			
-			//System.out.println("remoteState: " + remoteState + ", state: " + state);
-			
 			//There is no more work left
 			if(remoteState == 0 && state == 0) {
 				transferManager.writeMessage("result_syn");
@@ -97,9 +95,6 @@ public class Adaptor {
 			int remoteScaling = stateManager.getRemoteScaling();
 			int scaling = stateManager.getLocalScaling();
 			int transferCount = (state - remoteState) / (scaling + remoteScaling);
-			//System.out.println("remoteScaling: " + remoteScaling + ", scaling: " + scaling);
-			//System.out.println("remoteCpu: " + stateManager.getRemoteCpuUsage() + " Cpu: " + stateManager.getLocalCpuUsage());
-			//System.out.println("remoteJobsLeft: " + stateManager.getRemoteJobsLeft() + " jobsLeft: " + stateManager.getLocalJobsLeft());
 			if(transferCount == 0)
 				continue;
 			
@@ -109,8 +104,6 @@ public class Adaptor {
 			long jobTime = stateManager.getLocalJobTime();
 			long remoteJobTime = stateManager.getRemoteJobTime();
 			long transferTime = transferManager.getTransferTime();
-			//System.out.println("remoteJobTime: " + remoteJobTime + ", jobTime: " + jobTime);
-			//System.out.println("transferTime: " + transferTime);
 			if(negative) {
 				if(transferTime != 0 && remoteJobTime != 0)
 					transferCount = (int)Math.floor(transferCount / ((transferTime / remoteJobTime) + 1));
