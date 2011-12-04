@@ -8,6 +8,7 @@ public class Adaptor {
 	private static final int jobSize = 1000;
 	private static float throttle = 0.01f;
 	private static final long statePeriod = 100;
+	private static final int threshold = 100;
 	
 	private static final JobQueue jobs = new JobQueue(jobSize);
 	private static final ResultMap result = new ResultMap();
@@ -111,14 +112,20 @@ public class Adaptor {
 			if(negative) {
 				if(transferTime != 0 && remoteJobTime != 0)
 					transferCount = (int)Math.floor(transferCount / ((transferTime / remoteJobTime) + 1));
-				transferManager.pullJobs(transferCount);
-				System.out.println("> Pulled " + transferCount + " jobs");
+				
+				if(transferCount > threshold) {
+					transferManager.pullJobs(transferCount);
+					System.out.println("> Pulled " + transferCount + " jobs");
+				}
 			}
 			else {
 				if(transferTime != 0 && jobTime != 0)
 					transferCount = (int)Math.floor(transferCount / ((transferTime / jobTime) + 1));
-				transferManager.pushJobs(transferCount);
-				System.out.println("> Pushed " + transferCount + " jobs");
+				
+				if(transferCount > threshold) {
+					transferManager.pushJobs(transferCount);
+					System.out.println("> Pushed " + transferCount + " jobs");
+				}
 			}
 			
 			Thread.sleep(statePeriod);
