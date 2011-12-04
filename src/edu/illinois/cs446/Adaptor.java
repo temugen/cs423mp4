@@ -6,7 +6,7 @@ import java.util.Map;
 
 public class Adaptor {
 	private static final int jobSize = 10000;
-	private static float throttle = 0.25f;
+	private static float throttle = 0.7f;
 	private static final long statePeriod = 100;
 	private static final int threshold = 100;
 	
@@ -128,8 +128,8 @@ public class Adaptor {
 		
 		//Wait for results to be transferred, print them, and kill all threads
 		waitForNextStep();
-		/*if(isMaster)
-			printResult();*/
+		if(isMaster)
+			printResult();
 		System.out.println("> Complete");
 		System.exit(0);
 	}
