@@ -97,9 +97,9 @@ public class Adaptor {
 			int remoteScaling = stateManager.getRemoteScaling();
 			int scaling = stateManager.getLocalScaling();
 			int transferCount = (state - remoteState) / (scaling + remoteScaling);
-			System.out.println("remoteScaling: " + remoteScaling + ", scaling: " + scaling);
-			System.out.println("remoteCpu: " + stateManager.getRemoteCpuUsage() + " Cpu: " + stateManager.getLocalCpuUsage());
-			System.out.println("remoteJobsLeft: " + stateManager.getRemoteJobsLeft() + " jobsLeft: " + stateManager.getLocalJobsLeft());
+			//System.out.println("remoteScaling: " + remoteScaling + ", scaling: " + scaling);
+			//System.out.println("remoteCpu: " + stateManager.getRemoteCpuUsage() + " Cpu: " + stateManager.getLocalCpuUsage());
+			//System.out.println("remoteJobsLeft: " + stateManager.getRemoteJobsLeft() + " jobsLeft: " + stateManager.getLocalJobsLeft());
 			if(transferCount == 0)
 				continue;
 			
