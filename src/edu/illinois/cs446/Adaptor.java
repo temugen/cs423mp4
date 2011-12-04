@@ -28,7 +28,7 @@ public class Adaptor {
 		
 		//Send half of the data to the server
 		int halfCount = jobs.size() / 2;
-		transferManager.sendJobs(halfCount);
+		transferManager.pushJobs(halfCount);
 		transferManager.writeMessage("bootstrap_syn");
 	}
 	

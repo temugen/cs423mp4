@@ -46,19 +46,24 @@ public class TransferManager extends Thread {
 		writeLock.unlock();
 	}
 	
-	public int sendJobs(int count) {
+	public int pushJobs(int count) {
 		for(int i = 0; i < count; i++) {
 			int[] pixels = jobs.poll();
 			if(pixels == null)
 				return i;
 			
-			writeMessage("job");
+			writeMessage("job_push");
 			writeInt(pixels.length);
 			for(int pixel : pixels)
 				writeInt(pixel);
 		}
 		
 		return count;
+	}
+	
+	public void pullJobs(int count) {
+		writeMessage("job_pull");
+		writeInt(count);
 	}
 	
 	private void readJob() {
@@ -114,8 +119,11 @@ public class TransferManager extends Thread {
 				readResult();
 				signalStep();
 			}
-			else if(line.equals("job")) {
+			else if(line.equals("job_push")) {
 				readJob();
+			}
+			else if(line.equals("job_pull")) {
+				pushJobs(readInt());
 			}
 		}
 	}

@@ -31,8 +31,7 @@ public class HardwareMonitor {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-		}
-		
+		}	
 	}
 	
 	public HardwareMonitor(long period) {
