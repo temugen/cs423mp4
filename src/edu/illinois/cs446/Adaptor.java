@@ -98,11 +98,13 @@ public class Adaptor {
 				if(transferTime != 0 && remoteWorkTime != 0)
 					transferCount = (int)Math.floor(transferCount / ((transferTime / remoteWorkTime) + 1));
 				transferManager.pullJobs(transferCount);
+				System.out.println("> Pulled " + transferCount + " jobs");
 			}
 			else {
 				if(transferTime != 0 && workTime != 0)
 					transferCount = (int)Math.floor(transferCount / ((transferTime / workTime) + 1));
 				transferManager.pushJobs(transferCount);
+				System.out.println("> Pushed " + transferCount + " jobs");
 			}
 		}
 		

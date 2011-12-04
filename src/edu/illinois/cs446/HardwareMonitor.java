@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.util.Timer;
 import java.util.TimerTask;
 
+
 public class HardwareMonitor {
 	private Timer timer = new Timer();
 	private CollectHardwareInfoTask collectHardwareInfoTask = new CollectHardwareInfoTask();
