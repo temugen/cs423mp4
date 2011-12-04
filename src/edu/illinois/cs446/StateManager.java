@@ -20,6 +20,7 @@ public class StateManager extends Thread {
 	private float remoteThrottle = 0.0f;
 	private List<Worker> workers = new ArrayList<Worker>();
 	private long period;
+	private boolean isValid = false;
 	
 	private class SendStateTask extends TimerTask {
 		private StateManager stateManager;
@@ -133,6 +134,10 @@ public class StateManager extends Thread {
 		return remoteState;
 	}
 	
+	public boolean isValid() {
+		return this.isValid;
+	}
+	
 	@Override
 	public void run() {
 		if(network instanceof Server)
@@ -149,6 +154,7 @@ public class StateManager extends Thread {
 				remoteThrottle = readFloat();
 				remoteCpuUsage = readInt();
 				remoteJobTime = readInt();
+				isValid = true;
 			}
 		}
 	}

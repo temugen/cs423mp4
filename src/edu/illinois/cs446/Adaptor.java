@@ -74,8 +74,16 @@ public class Adaptor {
 		//Dynamically push or pull jobs based on local and remote state
 		stateManager.start();
 		while(isMaster) {
+			
+			//We don't have valid state yet
+			if(!stateManager.isValid()) {
+				Thread.sleep(statePeriod);
+				continue;
+			}
+			
 			int remoteState = stateManager.getRemoteState();
 			int state = stateManager.getLocalState();
+			
 			System.out.println("remoteState: " + remoteState + ", state: " + state);
 			
 			//There is no more work left
