@@ -43,7 +43,7 @@ public class Adaptor {
 		}
 	}
 	
-	private static void printResults() {
+	private static void printResult() {
 		for(Map.Entry<Integer, Integer> pair : result.entrySet())
 			System.out.println("<" + Integer.toHexString(pair.getKey()) + "," + pair.getValue() + ">");
 	}
@@ -80,13 +80,11 @@ public class Adaptor {
 			}
 		}
 		
-		//Wait for results to be transferred and print results
+		//Wait for results to be transferred, print results, and kill all threads
 		waitForNextStep();
-		printResults();
-		
+		if(isMaster)
+			printResult();
 		System.out.println("Finished...");
-		
-		//Kill all threads
 		System.exit(0);
 	}
 }
