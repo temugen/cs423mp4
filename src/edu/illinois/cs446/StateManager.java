@@ -91,7 +91,7 @@ public class StateManager extends Thread {
 	}
 	
 	public int getLocalScaling() {
-		return Math.max(1, hardwareMonitor.getCpuUsage()) * Math.max(1, (int)((1.0f - throttle) * 100)) * Math.max(1, getLocalJobTime());
+		return Math.max(1, hardwareMonitor.getCpuUsage() / 10) * Math.max(1, (int)((1.0f - throttle) * 100) / 10) * Math.max(1, getLocalJobTime() / 10);
 	}
 
 	public int getLocalState() {
