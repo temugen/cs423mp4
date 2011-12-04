@@ -58,7 +58,7 @@ public class TransferManager extends Thread {
 	}
 	
 	private void readJob() {
-		int count = new Integer(readMessage());
+		int count = readInt();
 		IntBuffer buffer = IntBuffer.allocate(count);
 		for(int i = 0; i < count; i++)
 			buffer.put(readInt());
