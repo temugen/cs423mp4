@@ -9,6 +9,7 @@ public class Adaptor {
 	private static float throttle = 0.7f;
 	private static final long statePeriod = 100;
 	private static final int threshold = 100;
+	private static final int workers = 2;
 	
 	private static final JobQueue jobs = new JobQueue(jobSize);
 	private static final ResultMap result = new ResultMap();
@@ -67,9 +68,11 @@ public class Adaptor {
 		System.out.println("> Bootstrapped");
 		
 		//Start worker threads
-		Worker worker = new Worker(jobs, result, stateManager);
-		stateManager.addWorker(worker);
-		worker.start();
+		for(int i = 0; i < workers; i++) {
+			Worker worker = new Worker(jobs, result, stateManager);
+			stateManager.addWorker(worker);
+			worker.start();
+		}
 		System.out.println("> Started Worker threads");
 		
 		//Dynamically push or pull jobs based on local and remote state
