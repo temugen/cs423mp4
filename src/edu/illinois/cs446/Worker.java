@@ -4,17 +4,18 @@ package edu.illinois.cs446;
 public class Worker extends Thread {
 	private JobQueue jobs;
 	private ResultMap result;
-	private float throttle;
+	private StateManager stateManager;
 	
-	public Worker(JobQueue jobs, ResultMap result, float throttle) {
+	public Worker(JobQueue jobs, ResultMap result, StateManager stateManager) {
 		this.jobs = jobs;
 		this.result = result;
-		this.throttle = throttle;
+		this.stateManager = stateManager;
 	}
 	
 	@Override
 	public void run() {
 		while(true) {
+			float throttle = stateManager.getThrottle();
 			long time = doWork();
 			long sleepTime = (long)(time * ((1.0f-throttle) / throttle));
 			try {

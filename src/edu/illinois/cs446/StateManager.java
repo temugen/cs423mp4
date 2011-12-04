@@ -10,6 +10,7 @@ import java.util.concurrent.locks.ReentrantLock;
 public class StateManager {
 	private Network network;
 	private JobQueue jobs;
+	private float throttle;
 	private Timer timer = new Timer();
 	private Lock writeLock = new ReentrantLock();
 	private static final HardwareMonitor hardwareMonitor = new HardwareMonitor();
@@ -28,12 +29,17 @@ public class StateManager {
 		
 	}
 	
-	public StateManager(Network network, JobQueue jobs, long period) {
+	public StateManager(Network network, JobQueue jobs, long period, float throttle) {
 		this.network = network;
 		this.jobs = jobs;
+		this.throttle = throttle;
 		
 		if(network instanceof Server)
 			timer.scheduleAtFixedRate(new SendStateTask(this), 0, period);
+	}
+	
+	public float getThrottle() {
+		return throttle;
 	}
 	
 	private String readMessage() {

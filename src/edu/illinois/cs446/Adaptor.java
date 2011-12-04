@@ -6,7 +6,7 @@ import java.util.Map;
 
 public class Adaptor {
 	private static final int jobSize = 1000;
-	private static final float throttle = 0.7f;
+	private static float throttle = 0.7f;
 	private static final long statePeriod = 1000;
 	
 	private static final JobQueue jobs = new JobQueue(jobSize);
@@ -28,13 +28,13 @@ public class Adaptor {
 		transferManager = new TransferManager(new Client(host, port), jobs, result);
 		transferManager.sendJobs(halfCount);
 		
-		stateManager = new StateManager(new Client(host, port + 1), jobs, statePeriod);
+		stateManager = new StateManager(new Client(host, port + 1), jobs, statePeriod, throttle);
 		transferManager.writeMessage("bootstrap_syn");
 	}
 	
 	private static void initServer(int port) throws IOException {
 		transferManager = new TransferManager(new Server(port), jobs, result);
-		stateManager = new StateManager(new Server(port + 1), jobs, statePeriod);
+		stateManager = new StateManager(new Server(port + 1), jobs, statePeriod, throttle);
 	}
 	
 	private static void waitForNextStep() throws InterruptedException {
@@ -55,7 +55,7 @@ public class Adaptor {
 	 */
 	public static void main(String[] args) throws IOException, InterruptedException {
 		//Start worker threads
-		Worker worker = new Worker(jobs, result, throttle);
+		Worker worker = new Worker(jobs, result, stateManager);
 		worker.start();
 		System.out.println("Started Worker threads...");
 		
@@ -80,7 +80,7 @@ public class Adaptor {
 			}
 		}
 		
-		//Wait for results to be transferred, print results, and kill all threads
+		//Wait for results to be transferred, print them, and kill all threads
 		waitForNextStep();
 		if(isMaster)
 			printResult();
