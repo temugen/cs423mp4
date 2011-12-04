@@ -106,8 +106,8 @@ public class Adaptor {
 			long jobTime = stateManager.getLocalJobTime();
 			long remoteJobTime = stateManager.getRemoteJobTime();
 			long transferTime = transferManager.getTransferTime();
-			System.out.println("remoteJobTime: " + remoteJobTime + ", jobTime: " + jobTime);
-			System.out.println("transferTime: " + transferTime);
+			//System.out.println("remoteJobTime: " + remoteJobTime + ", jobTime: " + jobTime);
+			//System.out.println("transferTime: " + transferTime);
 			if(negative) {
 				if(transferTime != 0 && remoteJobTime != 0)
 					transferCount = (int)Math.floor(transferCount / ((transferTime / remoteJobTime) + 1));
