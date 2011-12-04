@@ -13,7 +13,7 @@ public class StateManager {
 	private float throttle;
 	private Timer timer = new Timer();
 	private Lock writeLock = new ReentrantLock();
-	private static final HardwareMonitor hardwareMonitor = new HardwareMonitor();
+	private HardwareMonitor hardwareMonitor;
 	
 	private class SendStateTask extends TimerTask {
 		private StateManager stateManager;
@@ -33,6 +33,7 @@ public class StateManager {
 		this.network = network;
 		this.jobs = jobs;
 		this.throttle = throttle;
+		hardwareMonitor = new HardwareMonitor(period);
 		
 		if(!network.isConnected())
 			network.connect();
@@ -70,7 +71,7 @@ public class StateManager {
 	}
 	
 	public int getLocalState() {
-		return jobs.size();
+		return jobs.size() * hardwareMonitor.getCpuUsage() * (int)((1 - throttle) * 100);
 	}
 	
 	public int getRemoteState() {
