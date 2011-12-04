@@ -13,10 +13,14 @@ public class TransferManager extends Thread {
 	private ResultMap result;
 	private Lock writeLock = new ReentrantLock();
 	
-	public TransferManager(Network network, JobQueue jobs, ResultMap result) {
+	public TransferManager(Network network, JobQueue jobs, ResultMap result) throws IOException {
 		this.network = network;
 		this.jobs = jobs;
 		this.result = result;
+		
+		if(!network.isConnected())
+			network.connect();
+		System.out.println("> TransferManager connected");
 	}
 	
 	private String readMessage() {

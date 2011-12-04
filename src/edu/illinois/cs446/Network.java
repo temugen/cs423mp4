@@ -10,12 +10,14 @@ public class Network {
 	protected PrintWriter out;
 	protected BufferedReader in;
 	protected Socket remoteSocket;
-	protected boolean connected;
+	private boolean connected = false;
+	protected String host;
+	protected int port;
 	
-	protected void connect() throws IOException {
-		connected = true;
+	public void connect() throws IOException {
 		out = new PrintWriter(remoteSocket.getOutputStream(), true);
 		in = new BufferedReader(new InputStreamReader(remoteSocket.getInputStream()));
+		connected = true;
 	}
 	
 	public String read() throws IOException {
@@ -31,5 +33,9 @@ public class Network {
 		in.close();
 		out.close();
 		remoteSocket.close();
+	}
+	
+	public boolean isConnected() {
+		return connected;
 	}
 }

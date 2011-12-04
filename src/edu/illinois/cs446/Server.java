@@ -8,6 +8,11 @@ public class Server extends Network {
 	private ServerSocket serverSocket;
 	
 	public Server(int port) throws IOException {
+		this.port = port;
+	}
+	
+	@Override
+	public void connect() throws IOException {
 		try {
 		    serverSocket = new ServerSocket(port);
 		} catch (IOException e) {
@@ -17,14 +22,16 @@ public class Server extends Network {
 		
 		try {
 		    remoteSocket = serverSocket.accept();
+		    this.host = remoteSocket.getInetAddress().getHostAddress();
 		} catch (IOException e) {
 		    System.out.println("Accept failed: " + port);
 		    System.exit(-1);
 		}
 		
-		connect();
+		super.connect();
 	}
 	
+	@Override
 	public void close() throws IOException {
 		super.close();
 		serverSocket.close();

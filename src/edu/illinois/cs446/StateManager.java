@@ -29,10 +29,14 @@ public class StateManager {
 		
 	}
 	
-	public StateManager(Network network, JobQueue jobs, long period, float throttle) {
+	public StateManager(Network network, JobQueue jobs, long period, float throttle) throws IOException {
 		this.network = network;
 		this.jobs = jobs;
 		this.throttle = throttle;
+		
+		if(!network.isConnected())
+			network.connect();
+		System.out.println("> StateManager connected");
 		
 		if(network instanceof Server)
 			timer.scheduleAtFixedRate(new SendStateTask(this), 0, period);

@@ -8,6 +8,12 @@ import java.net.UnknownHostException;
 public class Client extends Network {
 	
 	public Client(String host, int port) throws IOException {
+		this.host = host;
+		this.port = port;
+	}
+	
+	@Override
+	public void connect() throws IOException {
 		try {
 			remoteSocket = new Socket(host, port);
 		} catch (UnknownHostException e) {
@@ -18,6 +24,6 @@ public class Client extends Network {
 		    System.exit(-1);
 		}
 		
-		connect();
+		super.connect();
 	}
 }

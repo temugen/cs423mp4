@@ -19,9 +19,7 @@ public class Adaptor {
 		isMaster = true;
 	
 		transferManager = new TransferManager(new Client(host, port), jobs, result);
-		System.out.println("TransferManager connected...");
 		stateManager = new StateManager(new Client(host, port + 1), jobs, statePeriod, throttle);
-		System.out.println("StateManager connected...");
 		
 		//Load all of the jobs
 		ImageManager images = new ImageManager();
@@ -34,12 +32,9 @@ public class Adaptor {
 		transferManager.writeMessage("bootstrap_syn");
 	}
 	
-	private static void initServer(int port) throws IOException, InterruptedException {
+	private static void initServer(int port) throws IOException {
 		transferManager = new TransferManager(new Server(port), jobs, result);
-		System.out.println("TransferManager connected...");
-		Thread.sleep(2000);
 		stateManager = new StateManager(new Server(port + 1), jobs, statePeriod, throttle);
-		System.out.println("StateManager connected...");
 	}
 	
 	private static void waitForNextStep() throws InterruptedException {
@@ -59,6 +54,8 @@ public class Adaptor {
 	 * @throws InterruptedException 
 	 */
 	public static void main(String[] args) throws IOException, InterruptedException {
+		System.out.println("> Adaptor loaded");
+		
 		//Bootstrap
 		if(args.length > 1)
 			initClient(args[0], new Integer(args[1]));
@@ -66,12 +63,12 @@ public class Adaptor {
 			initServer(new Integer(args[0]));
 		transferManager.start();
 		waitForNextStep();
-		System.out.println("Bootstrapped...");
+		System.out.println("> Bootstrapped");
 		
 		//Start worker threads
 		Worker worker = new Worker(jobs, result, stateManager);
 		worker.start();
-		System.out.println("Started Worker threads...");
+		System.out.println("> Started Worker threads");
 		
 		//Dynamically push or pull jobs based on local and remote state
 		while(isMaster) {
@@ -88,7 +85,7 @@ public class Adaptor {
 		waitForNextStep();
 		if(isMaster)
 			printResult();
-		System.out.println("Finished...");
+		System.out.println("> Complete");
 		System.exit(0);
 	}
 }
