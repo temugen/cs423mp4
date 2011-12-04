@@ -16,8 +16,8 @@ public class StateManager extends Thread {
 	private Timer timer = new Timer();
 	private Lock writeLock = new ReentrantLock();
 	private HardwareMonitor hardwareMonitor;
-	private int remoteState = 1, remoteScaling = 1, remoteCpuUsage = 1, remoteJobTime = 1;
-	private float remoteThrottle = 1.0f;
+	private int remoteState = 0, remoteScaling = 0, remoteCpuUsage = 0, remoteJobTime = 0;
+	private float remoteThrottle = 0.0f;
 	private List<Worker> workers = new ArrayList<Worker>();
 	private long period;
 	
