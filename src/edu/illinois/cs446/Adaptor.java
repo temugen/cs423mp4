@@ -85,7 +85,7 @@ public class Adaptor {
 			int remoteState = stateManager.getRemoteState();
 			int state = stateManager.getLocalState();
 			
-			System.out.println("remoteState: " + remoteState + ", state: " + state);
+			//System.out.println("remoteState: " + remoteState + ", state: " + state);
 			
 			//There is no more work left
 			if(remoteState == 0 && state == 0) {
