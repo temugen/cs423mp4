@@ -68,7 +68,8 @@ public class TransferManager extends Thread {
 	private void writeResult() {
 		writeInt(result.size());
 		for(Map.Entry<Integer, Integer> pair : result.entrySet()) {
-			writeMessage(Integer.toString(pair.getKey(), Character.MAX_RADIX));
+			writeInt(pair.getKey());
+			writeInt(pair.getValue());
 		}
 	}
 	
