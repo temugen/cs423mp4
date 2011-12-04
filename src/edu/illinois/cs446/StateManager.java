@@ -19,6 +19,7 @@ public class StateManager extends Thread {
 	private int remoteState = 1, remoteScaling = 1, remoteCpuUsage = 1, remoteJobTime = 1;
 	private float remoteThrottle = 1.0f;
 	private List<Worker> workers = new ArrayList<Worker>();
+	private long period;
 	
 	private class SendStateTask extends TimerTask {
 		private StateManager stateManager;
@@ -42,14 +43,12 @@ public class StateManager extends Thread {
 		this.network = network;
 		this.jobs = jobs;
 		this.throttle = throttle;
+		this.period = period;
 		hardwareMonitor = new HardwareMonitor(period);
 		
 		if(!network.isConnected())
 			network.connect();
 		System.out.println("> StateManager connected");
-		
-		if(network instanceof Server)
-			timer.scheduleAtFixedRate(new SendStateTask(this), 0, period);
 	}
 	
 	public void addWorker(Worker worker) {
@@ -136,6 +135,9 @@ public class StateManager extends Thread {
 	
 	@Override
 	public void run() {
+		if(network instanceof Server)
+			timer.scheduleAtFixedRate(new SendStateTask(this), 0, period);
+		
 		while(true) {
 			String line = readMessage();
 			if(line == null)

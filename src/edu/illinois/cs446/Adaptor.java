@@ -72,7 +72,7 @@ public class Adaptor {
 		System.out.println("> Started Worker threads");
 		
 		//Dynamically push or pull jobs based on local and remote state
-		stateManager.run();
+		stateManager.start();
 		while(isMaster) {
 			int remoteState = stateManager.getRemoteState();
 			int state = stateManager.getLocalState();
