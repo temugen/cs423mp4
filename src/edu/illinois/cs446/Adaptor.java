@@ -57,7 +57,7 @@ public class Adaptor {
 		//Start worker threads
 		Worker worker = new Worker(jobs, result, throttle);
 		worker.start();
-		System.out.println("Started worker threads...");
+		System.out.println("Started Worker threads...");
 		
 		//Bootstrap
 		if(args.length > 1)
@@ -65,6 +65,7 @@ public class Adaptor {
 		else
 			initServer(new Integer(args[0]));
 		transferManager.start();
+		System.out.println("TransferManager and StateManager loaded...");
 		waitForNextStep();
 		System.out.println("Bootstrapped...");
 		
