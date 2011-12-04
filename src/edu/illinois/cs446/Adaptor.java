@@ -54,11 +54,6 @@ public class Adaptor {
 	 * @throws InterruptedException 
 	 */
 	public static void main(String[] args) throws IOException, InterruptedException {
-		//Start worker threads
-		Worker worker = new Worker(jobs, result, stateManager);
-		worker.start();
-		System.out.println("Started Worker threads...");
-		
 		//Bootstrap
 		if(args.length > 1)
 			initClient(args[0], new Integer(args[1]));
@@ -68,6 +63,11 @@ public class Adaptor {
 		System.out.println("TransferManager and StateManager loaded...");
 		waitForNextStep();
 		System.out.println("Bootstrapped...");
+		
+		//Start worker threads
+		Worker worker = new Worker(jobs, result, stateManager);
+		worker.start();
+		System.out.println("Started Worker threads...");
 		
 		//Dynamically push or pull jobs based on local and remote state
 		while(isMaster) {
