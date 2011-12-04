@@ -61,6 +61,46 @@ public class Adaptor {
 		for(Map.Entry<Integer, Integer> pair : result.entrySet())
 			System.out.println("<" + Integer.toHexString(pair.getKey()) + "," + pair.getValue() + ">");
 	}
+	
+	private static boolean isComplete() {
+		int remoteState = stateManager.getRemoteState();
+		int state = stateManager.getLocalState();
+		return (remoteState == 0 && state == 0);
+	}
+	
+	private static int getIdealTransferCount() {
+		int remoteState = stateManager.getRemoteState();
+		int state = stateManager.getLocalState();
+		int remoteScaling = stateManager.getRemoteScaling();
+		int scaling = stateManager.getLocalScaling();
+		int transferCount = (state - remoteState) / (scaling + remoteScaling);
+		return transferCount;
+	}
+	
+	private static int smoothTransferCount(int transferCount) {
+		boolean negative = transferCount < 0;
+		transferCount = Math.abs(transferCount);
+		long jobTime = stateManager.getLocalJobTime();
+		long remoteJobTime = stateManager.getRemoteJobTime();
+		long transferTime = transferManager.getTransferTime();
+		
+		if(negative) {
+			if(transferTime != 0 && remoteJobTime != 0)
+				transferCount = (int)Math.floor(transferCount / ((transferTime / remoteJobTime) + 1));
+			
+			if(transferCount > threshold)
+				return -transferCount;
+		}
+		else {
+			if(transferTime != 0 && jobTime != 0)
+				transferCount = (int)Math.floor(transferCount / ((transferTime / jobTime) + 1));
+			
+			if(transferCount > threshold)
+				return transferCount;
+		}
+		
+		return 0;
+	}
 
 	/**
 	 * @param args
@@ -78,6 +118,7 @@ public class Adaptor {
 		waitForNextStep();
 		System.out.println("> Bootstrapped");
 		
+		//Start workers
 		initWorkers();
 		System.out.println("> Started Worker threads");
 		
@@ -90,45 +131,26 @@ public class Adaptor {
 				continue;
 			}
 			
-			int remoteState = stateManager.getRemoteState();
-			int state = stateManager.getLocalState();
-			
 			//There is no more work left
-			if(remoteState == 0 && state == 0) {
+			if(isComplete()) {
 				transferManager.writeMessage("result_syn");
 				break;
 			}
 			
 			//Calculate the ideal number of jobs to transfer in order to balance
-			int remoteScaling = stateManager.getRemoteScaling();
-			int scaling = stateManager.getLocalScaling();
-			int transferCount = (state - remoteState) / (scaling + remoteScaling);
+			int transferCount = getIdealTransferCount();
+			//Adjust transferCount to minimize the combined transfer and processing time
+			transferCount = smoothTransferCount(transferCount);
 			if(transferCount == 0)
 				continue;
 			
-			//Adjust transferCount to minimize the combined transfer and processing time
-			boolean negative = transferCount < 0;
-			transferCount = Math.abs(transferCount);
-			long jobTime = stateManager.getLocalJobTime();
-			long remoteJobTime = stateManager.getRemoteJobTime();
-			long transferTime = transferManager.getTransferTime();
-			if(negative) {
-				if(transferTime != 0 && remoteJobTime != 0)
-					transferCount = (int)Math.floor(transferCount / ((transferTime / remoteJobTime) + 1));
-				
-				if(transferCount > threshold) {
-					transferManager.pullJobs(transferCount);
-					System.out.println("> Pulled " + transferCount + " jobs");
-				}
+			if(transferCount > 0) {
+				transferManager.pushJobs(transferCount);
+				System.out.println("> Pushed " + transferCount + " jobs");
 			}
 			else {
-				if(transferTime != 0 && jobTime != 0)
-					transferCount = (int)Math.floor(transferCount / ((transferTime / jobTime) + 1));
-				
-				if(transferCount > threshold) {
-					transferManager.pushJobs(transferCount);
-					System.out.println("> Pushed " + transferCount + " jobs");
-				}
+				transferManager.pullJobs(-transferCount);
+				System.out.println("> Pulled " + transferCount + " jobs");
 			}
 			
 			Thread.sleep(statePeriod);
