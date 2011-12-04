@@ -52,6 +52,10 @@ public class StateManager {
 			timer.scheduleAtFixedRate(new SendStateTask(this), 0, period);
 	}
 	
+	public void addWorker(Worker worker) {
+		workers.add(worker);
+	}
+	
 	private String readMessage() {
 		try {
 			return network.read();

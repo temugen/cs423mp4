@@ -67,6 +67,7 @@ public class Adaptor {
 		
 		//Start worker threads
 		Worker worker = new Worker(jobs, result, stateManager);
+		stateManager.addWorker(worker);
 		worker.start();
 		System.out.println("> Started Worker threads");
 		
