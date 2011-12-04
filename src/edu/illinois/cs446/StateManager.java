@@ -92,6 +92,10 @@ public class StateManager extends Thread {
 		return throttle;
 	}
 	
+	public void setThrottle(float throttle) {
+		this.throttle = throttle;
+	}
+	
 	public int getLocalScaling() {
 		return Math.max(1, hardwareMonitor.getCpuUsage()) * Math.max(1, (int)((1.0f - throttle) * 100));
 	}

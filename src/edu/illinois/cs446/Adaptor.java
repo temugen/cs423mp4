@@ -1,5 +1,6 @@
 package edu.illinois.cs446;
 
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.Map;
 
@@ -16,6 +17,7 @@ public class Adaptor {
 	private static TransferManager transferManager;
 	private static StateManager stateManager;
 	private static boolean isMaster = false;
+	private static GUI gui;
 	
 	private static void initClient(String host, int port) throws IOException {
 		isMaster = true;
@@ -24,6 +26,8 @@ public class Adaptor {
 		transferManager.start();
 		stateManager = new StateManager(new Client(host, port + 1), jobs, statePeriod, throttle);
 		stateManager.start();
+		gui = new GUI(stateManager, isMaster);
+		new Thread(gui).start();
 		
 		//Load all of the jobs
 		ImageManager images = new ImageManager();
@@ -41,6 +45,8 @@ public class Adaptor {
 		transferManager.start();
 		stateManager = new StateManager(new Server(port + 1), jobs, statePeriod, throttle);
 		stateManager.start();
+		gui = new GUI(stateManager, isMaster);
+		new Thread(gui).start();
 	}
 	
 	private static void initWorkers() {
@@ -57,9 +63,29 @@ public class Adaptor {
 		}
 	}
 	
-	private static void printResult() {
-		for(Map.Entry<Integer, Integer> pair : result.entrySet())
+	private static void displayResult() {
+		int width = 300, height = 400;
+		BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+		int x = 0, y = 0;
+		
+		for(Map.Entry<Integer, Integer> pair : result.entrySet()) {
 			System.out.println("<" + Integer.toHexString(pair.getKey()) + "," + pair.getValue() + ">");
+			
+			if(y == height)
+				continue;
+			for(int i = 0; i < Math.min(pair.getValue() / 10, width * 10); i++) {
+				image.setRGB(x, y, pair.getKey());
+				x++;
+				if(x == width) {
+					x = 0;
+					y++;
+				}
+				if(y == height)
+					break;
+			}
+		}
+				
+		gui.displayResult(image);
 	}
 	
 	private static boolean isComplete() {
@@ -156,11 +182,14 @@ public class Adaptor {
 			Thread.sleep(statePeriod);
 		}
 		
-		//Wait for results to be transferred, print them, and kill all threads
+		//Wait for results to be transferred and print them
 		waitForNextStep();
 		if(isMaster)
-			printResult();
+			displayResult();
 		System.out.println("> Complete");
-		System.exit(0);
+		
+		//Kill the non-master node
+		if(!isMaster)
+			System.exit(0);
 	}
 }
