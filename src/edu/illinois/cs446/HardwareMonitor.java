@@ -22,9 +22,13 @@ public class HardwareMonitor {
 				Runtime rt = Runtime.getRuntime();
 				Process pr = rt.exec("sar -u 1 1");
 				BufferedReader input = new BufferedReader(new InputStreamReader(pr.getInputStream()));
-				String line;
-				while((line = input.readLine()) != null);
-				System.out.println(line);
+				String lastLine = null, line;
+				while((line = input.readLine()) != null)
+					lastLine = line;
+				lastLine = lastLine.trim();
+				int start = lastLine.lastIndexOf(" ");
+				cpuUsage = 100 - Integer.parseInt(lastLine.substring(start));
+				System.out.println(cpuUsage);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
