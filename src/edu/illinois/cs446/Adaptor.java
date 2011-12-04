@@ -7,7 +7,7 @@ import java.util.Map;
 public class Adaptor {
 	private static final int jobSize = 1000;
 	private static float throttle = 0.7f;
-	private static final long statePeriod = 1000;
+	private static final long statePeriod = 100;
 	
 	private static final JobQueue jobs = new JobQueue(jobSize);
 	private static final ResultMap result = new ResultMap();
