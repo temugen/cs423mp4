@@ -112,6 +112,8 @@ public class Adaptor {
 				transferManager.pushJobs(transferCount);
 				System.out.println("> Pushed " + transferCount + " jobs");
 			}
+			
+			Thread.sleep(statePeriod);
 		}
 		
 		//Wait for results to be transferred, print them, and kill all threads
