@@ -57,6 +57,7 @@ public class TransferManager extends Thread {
 	 * @return the number of jobs actually sent
 	 */
 	public int pushJobs(int count) {
+		writeLock.lock();
 		for(int i = 0; i < count; i++) {
 			int[] pixels = jobs.poll();
 			if(pixels == null)
@@ -68,6 +69,7 @@ public class TransferManager extends Thread {
 			for(int pixel : pixels)
 				writeInt(pixel);
 		}
+		writeLock.unlock();
 		
 		return count;
 	}
@@ -77,8 +79,10 @@ public class TransferManager extends Thread {
 	 * @param count
 	 */
 	public void pullJobs(int count) {
+		writeLock.lock();
 		writeMessage("job_pull");
 		writeInt(count);
+		writeLock.unlock();
 	}
 	
 	/**
@@ -96,11 +100,14 @@ public class TransferManager extends Thread {
 	 * Send our result map over the network
 	 */
 	private void writeResult() {
+		writeLock.lock();
+		writeMessage("result_ack");
 		writeInt(result.size());
 		for(Map.Entry<Integer, Integer> pair : result.entrySet()) {
 			writeInt(pair.getKey());
 			writeInt(pair.getValue());
 		}
+		writeLock.unlock();
 	}
 	
 	/**
@@ -139,7 +146,6 @@ public class TransferManager extends Thread {
 				signalStep();
 			}
 			else if(line.equals("result_syn")) {
-				writeMessage("result_ack");
 				writeResult();
 				signalStep();
 			}
